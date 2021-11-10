@@ -20,7 +20,7 @@ Configuration can be edited with the _config.yml_ file that exists in the same d
 ### Recipes
 The most powerful config option is `recipes`, which is a list of 0 or more URLs pointing to soup "recipes".
 
-A recipe is a valid JSON document using the structure:
+A recipe is defined as a valid JSON document using the following structure:
 ```json
 {
   "section": [
@@ -42,7 +42,7 @@ where
 
 indicates 0 or more additional repeated elements of the same type as above.
 
-Note that trailing commas are not allowed in the JSON syntax – it's a good idea to validate the file before pushing any updates online.
+Note that trailing commas are not allowed in the JSON syntax – it's a good idea to validate the file before pushing any recipe updates online.
 
 #### Recipe sections
 
