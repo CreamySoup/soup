@@ -14,6 +14,8 @@ import yaml
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #                                                                             #
+# soup                                                                        #
+#                                                                             #
 # CreamySoup/"Creamy SourceMod Updater", a helper script for automatic       #
 # SourceMod plugin updates for in-active-development plugins.               #
 #                                                                          #
