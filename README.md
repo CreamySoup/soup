@@ -90,4 +90,4 @@ For full examples of valid recipes, see the [self updater](recipe_selfupdate.jso
 The script can by run manually with `python soup.py`, but is recommended to be automated as a [cron job](https://en.wikipedia.org/wiki/Cron) or similar.
 
 ## For developers
-The _soup.py_ Python script should be [PEP8](https://www.python.org/dev/peps/pep-0008/) compliant (tested using `pycodestyle`).
+The _soup.py_ Python script should be [PEP 8](https://www.python.org/dev/peps/pep-0008/) compliant (tested using `pycodestyle`).
