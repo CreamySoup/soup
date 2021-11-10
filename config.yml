@@ -16,3 +16,8 @@ encoding: utf-8
 # 1: some basic informational output
 # 2: more output for debugging purposes
 verbosity: 1
+
+# List of URLs to JSON files from which to query for updates.
+# Please see the relevant documentation for required JSON file syntax.
+recipes:
+    - https://raw.githubusercontent.com/CreamySoup/recipe-neotokyo/main/neotokyo_common.json

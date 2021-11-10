@@ -62,11 +62,6 @@ assert os.path.isdir(PLUGINS_COMPILER_PATH)
 SCRIPT_NAME = "Creamy SourceMod Updater"
 SCRIPT_VERSION = "1.0.0"
 
-# List of URLs to JSON files from which to query for updates.
-# Please see the relevant documentation for required JSON file syntax.
-RECIPES = [
-]
-
 
 def get_url_contents(url):
     try:
@@ -356,7 +351,7 @@ and trying to move the .smx from \"{plugin_binary_path}\" to
 def main():
     print_info(f"=== Running {SCRIPT_NAME}, v.{SCRIPT_VERSION} ===\n"
                f"Current time: {datetime.now()}")
-    for recipe in RECIPES:
+    for recipe in CFG["recipes"]:
         check_for_updates(recipe)
 
 
