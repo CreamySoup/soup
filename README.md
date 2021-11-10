@@ -9,7 +9,7 @@ While automation is nice, a malicious actor could use this updater to execute ar
 ## Installation
 Recommended to [install with pip](https://pip.pypa.io/en/stable/cli/pip_install/), using the _requirements.txt_ file.
 
-You should also consider using a [virtual environment](https://docs.python.org/3/library/venv.html) to isolate any Python dependencies from the rest of the system.
+You should also consider using a [virtual environment](https://docs.python.org/3/library/venv.html) to isolate any Python dependencies from the rest of the system (although if you go this route, any cron job should also run in that venv to have access to those deps).
 
 ### Requirements
 * Python 3
