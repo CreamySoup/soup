@@ -17,7 +17,7 @@ import yaml
 # CreamySoup/"Creamy SourceMod Updater", a helper script for automatic       #
 # SourceMod plugin updates for in-active-development plugins.               #
 #                                                                          #
-# This Python 3 script queries online JSON lists (PLUGINS_LISTS)          #
+# This Python 3 script queries online JSON lists ("RECIPES")              #
 # of in-development SourceMod plugins, and compares their source code    #
 # to the local gameserver's files, and automatically recompiles         #
 # plugins where the source code has seen changes since the last run.   #
@@ -64,7 +64,7 @@ SCRIPT_VERSION = "1.0.0"
 
 # List of URLs to JSON files from which to query for updates.
 # Please see the relevant documentation for required JSON file syntax.
-PLUGINS_LISTS = [
+RECIPES = [
 ]
 
 
@@ -156,10 +156,10 @@ def self_update(new_version, new_version_url):
         print_info("!! Self-update successful.")
 
 
-def check_for_updates(plugin_list):
-    print_info(f"=> Checking plugin list: {plugin_list}")
+def check_for_updates(recipe):
+    print_info(f"=> Checking for updates: {recipe}")
 
-    update_file_contents = get_url_contents(plugin_list)
+    update_file_contents = get_url_contents(recipe)
     if update_file_contents is None:
         return
     update_file_contents = update_file_contents.decode(CFG["encoding"])
@@ -356,8 +356,8 @@ and trying to move the .smx from \"{plugin_binary_path}\" to
 def main():
     print_info(f"=== Running {SCRIPT_NAME}, v.{SCRIPT_VERSION} ===\n"
                f"Current time: {datetime.now()}")
-    for plugin_list in PLUGINS_LISTS:
-        check_for_updates(plugin_list)
+    for recipe in RECIPES:
+        check_for_updates(recipe)
 
 
 if __name__ == '__main__':
