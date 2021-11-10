@@ -1,2 +1,82 @@
 # soup
-CreamySoup/"Creamy SourceMod Updater", a helper script for automated SourceMod plugin updates management.
+CreamySoup/"Creamy SourceMod Updater" (or just **_soup_** for short), a helper script for automated SourceMod plugin updates management.
+
+## Foreword of warning
+While automation is nice, a malicious actor could use this updater to execute arbitrary code on the target machine. Be sure to only use remote updater sources that you trust 100%, or maintain your own fork of such resources where you can review and control the updates.
+
+## Installation
+Recommended to [install with pip](https://pip.pypa.io/en/stable/cli/pip_install/), using the _requirements.txt_ file.
+
+You should also consider using a [virtual environment](https://docs.python.org/3/library/venv.html) to isolate any Python dependencies from the rest of the system.
+
+## Config
+Configuration can be edited with the _config.yml_ file that exists in the same dir as the Python script itself.
+
+### Recipes
+The most useful config option is `recipes`, which is a list of 0 or more URLs pointing to soup "recipes".
+
+A recipe is a valid JSON document using the structure:
+```json
+{
+  "section": [
+    {
+      "key": "value",
+      <...>
+    },
+    <...>
+  ],
+  <...>
+}
+```
+
+where
+
+```json
+<...>
+```
+
+indicates 0 or more additional repeated elements of the same type as above.
+
+Note that trailing commas are not allowed in the JSON syntax – it's a good idea to validate the file before pushing any updates online.
+
+#### Recipe sections
+
+There are three valid recipe sections: _updater_, _includes_, and _plugins_. Examples follow:
+
+* **updater** – A self-updater section for the soup.py script contents. Only one section in total of this kind should exist at most in all of the recipes being used.
+
+```json
+	"updater": [
+		{
+			"version": "1.0.0",
+			"url": "https://raw.githubusercontent.com/CreamySoup/soup/main/soup.py"
+		}
+	]
+```
+
+* **includes** – SourceMod include files that are required by some of the plugins in the recipes' _plugins_ section. Required file extension: .inc
+
+```json
+	"includes": [
+		{
+			"name": "neotokyo",
+			"about": "sourcemod-nt-include - The de facto NT standard include.",
+			"source_url": "https://raw.githubusercontent.com/softashell/sourcemod-nt-include/master/scripting/include/neotokyo.inc"
+		}
+	]
+```
+
+* **plugins** – SourceMod plugins that are to be kept up to date with their remote source code repositories. Required file extension: .sp
+
+```json
+	"plugins": [
+		{
+			"name": "nt_srs_limiter",
+			"about": "SRS rof limiter timed from time of shot, inspired by Rain's nt_quickswitchlimiter.",
+			"source_url": "https://raw.githubusercontent.com/Agiel/nt-srs-limiter/master/scripting/nt_srs_limiter.sp"
+		}
+	]
+```
+
+## Usage
+The script can by run manually with `python soup.py`, but is recommended to be automated as a [cron job](https://en.wikipedia.org/wiki/Cron) or similar.
