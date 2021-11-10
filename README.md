@@ -19,7 +19,7 @@ Configuration can be edited with the [_config.yml_](config.yml) file that exists
 Please see the additional comments within the config file for more information on the options.
 
 ### Recipes
-The most powerful config option is `recipes`, which is a list of 0 or more URLs pointing to soup "recipes".
+The most powerful config option is `recipes`, which is a list of 0 or more URLs pointing to soup.py "recipes".
 
 A recipe is defined as a valid JSON document using the following structure:
 ```json
