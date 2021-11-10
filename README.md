@@ -1,6 +1,8 @@
 # soup
 CreamySoup/"Creamy SourceMod Updater" (or just **_soup_** for short), a helper script for automated SourceMod plugin updates management.
 
+This project started as a custom utility for the Creamy Neotokyo server (hence the name), but open sourcing and generalising it for any kind of SRCDS/SourceMod servers seemed like a good idea, in case it's helpful for someone else too.
+
 ## Foreword of warning
 While automation is nice, a malicious actor could use this updater to execute arbitrary code on the target machine. Be sure to only use remote updater sources that you trust 100%, or maintain your own fork of such resources where you can review and control the updates.
 
@@ -9,11 +11,14 @@ Recommended to [install with pip](https://pip.pypa.io/en/stable/cli/pip_install/
 
 You should also consider using a [virtual environment](https://docs.python.org/3/library/venv.html) to isolate any Python dependencies from the rest of the system.
 
+### Requirements
+* Python 3
+
 ## Config
 Configuration can be edited with the _config.yml_ file that exists in the same dir as the Python script itself.
 
 ### Recipes
-The most useful config option is `recipes`, which is a list of 0 or more URLs pointing to soup "recipes".
+The most powerful config option is `recipes`, which is a list of 0 or more URLs pointing to soup "recipes".
 
 A recipe is a valid JSON document using the structure:
 ```json
@@ -78,8 +83,10 @@ There are three valid recipe sections: _updater_, _includes_, and _plugins_. Exa
 	]
 ```
 
+For full examples of valid recipes, see the [self updater](recipe_selfupdate.json) in this repo, and the [Neotokyo recipe](https://github.com/CreamySoup/recipe-neotokyo) repository.
+
 ## Usage
 The script can by run manually with `python soup.py`, but is recommended to be automated as a [cron job](https://en.wikipedia.org/wiki/Cron) or similar.
 
 ## For developers
-The _soup.py_ Python script should be [PEP8](https://www.python.org/dev/peps/pep-0008/) compliant.
+The _soup.py_ Python script should be [PEP8](https://www.python.org/dev/peps/pep-0008/) compliant (tested using `pycodestyle`).
