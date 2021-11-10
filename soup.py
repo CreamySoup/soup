@@ -39,7 +39,8 @@ import yaml
 #                                                        #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-CFG = yaml.safe_load(open("config.yml"))
+CFG_FILE = open("config.yml")
+CFG = yaml.safe_load(CFG_FILE)
 
 # Relative path to the server's "addons/sourcemod/plugins" directory.
 PLUGINS_LOCAL_PATH = os.path.join(".", CFG["game_dir"], "addons",
@@ -359,3 +360,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+CFG_FILE.close()
