@@ -1,0 +1,18 @@
+# The game or mod root load directory (same as "-game" in Source launch parms).
+# SourceMod files should be structured as:
+# <soup.py root dir>
+# |
+# └───<game_dir>
+#     |
+#     └───"addons"
+#         |
+#         └───"sourcemod"
+game_dir: NeotokyoSource
+
+# Encoding to be used for the source code files handled by the updater.
+encoding: utf-8
+
+# 0: silent except errors
+# 1: some basic informational output
+# 2: more output for debugging purposes
+verbosity: 1
