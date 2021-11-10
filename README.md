@@ -15,7 +15,7 @@ You should also consider using a [virtual environment](https://docs.python.org/3
 * Python 3
 
 ## Config
-Configuration can be edited with the [_config.yml_](config.yml) file that exists in the same dir as the Python script itself.
+Configuration can be edited in the [_config.yml_](config.yml) file that exists in the same dir as the Python script itself.
 Please see the additional comments within the config file for more information on the options.
 
 ### Recipes
