@@ -18,7 +18,7 @@ You should always use the [default self-updater recipe](recipe_selfupdate.json) 
 
 If you are operating a Neotokyo SRCDS, this project offers [some recommended recipe(s) here](https://github.com/CreamySoup/recipe-neotokyo). This resource is still work-in-progress, more curated lists to be added later!
 
-You can also host your own custom _recipes_ as you like.
+You can also host your own custom _recipes_ as you like for any SRCDS+SourceMod server setup.
 
 ## Foreword of warning
 While automation is nice, a malicious actor could use this updater to execute arbitrary code on the target machine. Be sure to only use updater source lists ("recipes") that you trust 100%, or maintain your own fork of such resources where you can review and control the updates.
