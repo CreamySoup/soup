@@ -5,6 +5,14 @@ This project started as a custom utility for the Creamy Neotokyo servers (hence 
 
 ![alt text](promo/example_diagram.svg)
 
+## FAQ
+### What it be?
+**soup** is a Python 3 script, intended to be invoked periodically by an external cronjob-like automation system.
+
+It parses _soup recipes_, remote lists of resources to be kept up-to-date, compares those resources' contents to the target machine's local files, and re-downloads & re-compiles them if they differ. For a SourceMod plugin, this means any updates get automatically applied on the next mapchange after the completion of a soup update cycle.
+
+The purpose of _soup_ is to reduce admin workload by making SourceMod plugin updates more automated, while also providing some granularity in terms of which plugins get updated when, with the introduction of maintained/curated _recipes_. For example, you can have some trusted _recipes_ auto-update their target plugins without any admin intervention, but choose to manually update more fragile or experimental plugins as required (or not at all).
+
 ## Foreword of warning
 While automation is nice, a malicious actor could use this updater to execute arbitrary code on the target machine. Be sure to only use updater source lists ("recipes") that you trust 100%, or maintain your own fork of such resources where you can review and control the updates.
 
