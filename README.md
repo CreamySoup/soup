@@ -13,6 +13,13 @@ It parses _soup recipes_, remote lists of resources to be kept up-to-date, compa
 
 The purpose of _soup_ is to reduce admin workload by making SourceMod plugin updates more automated, while also providing some granularity in terms of which plugins get updated when, with the introduction of maintained/curated _recipes_. For example, you can have some trusted _recipes_ auto-update their target plugins without any admin intervention, but choose to manually update more fragile or experimental plugins as required (or not at all).
 
+### Which recipes to use?
+You should always use the [default self-updater recipe](recipe_selfupdate.json) to keep the _soup_ script itself updated.
+
+If you are operating a Neotokyo SRCDS, this project offers [some recommended recipe(s) here](https://github.com/CreamySoup/recipe-neotokyo). This resource is still work-in-progress, more curated lists to be added later!
+
+You can also host your own custom _recipes_ as you like.
+
 ## Foreword of warning
 While automation is nice, a malicious actor could use this updater to execute arbitrary code on the target machine. Be sure to only use updater source lists ("recipes") that you trust 100%, or maintain your own fork of such resources where you can review and control the updates.
 
