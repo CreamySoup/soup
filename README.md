@@ -28,7 +28,7 @@ Recommended to [install with pip](https://pip.pypa.io/en/stable/cli/pip_install/
 
 You should also consider using a [virtual environment](https://docs.python.org/3/library/venv.html) to isolate any Python dependencies from the rest of the system (although if you go this route, any cron job or similar automation should also run in that venv to have access to those deps).
 
-### Requirements
+### Other requirements
 * Python 3
 
 ## Config
