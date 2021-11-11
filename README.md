@@ -3,6 +3,8 @@ CreamySoup/"Creamy SourceMod Updater" (or just **_soup_** for short), a helper s
 
 This project started as a custom utility for the Creamy Neotokyo servers (hence the name), but open sourcing and generalising it for any kind of SRCDS/SourceMod servers seemed like a good idea, in case it's helpful for someone else too.
 
+![alt text](promo/example_diagram.svg)
+
 ## Foreword of warning
 While automation is nice, a malicious actor could use this updater to execute arbitrary code on the target machine. Be sure to only use remote updater sources that you trust 100%, or maintain your own fork of such resources where you can review and control the updates.
 
