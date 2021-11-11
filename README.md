@@ -104,7 +104,7 @@ There are three valid recipe sections: _updater_, _includes_, and _plugins_. Exa
 For full examples of valid recipes, see the [self updater](recipe_selfupdate.json) in this repo, and the [Neotokyo recipe](https://github.com/CreamySoup/recipe-neotokyo) repository. By default, this repo is configured for game "NeotokyoSource", and to use these Neotokyo default recipes.
 
 ## Usage
-The script can by run manually with `python soup.py`, but is recommended to be automated as a [cron job](https://en.wikipedia.org/wiki/Cron) or similar.
+The script can be run manually with `python soup.py`, but is recommended to be automated as a [cron job](https://en.wikipedia.org/wiki/Cron) or similar.
 
 ## For developers
 The _soup.py_ Python script should be [PEP 8](https://www.python.org/dev/peps/pep-0008/) compliant (tested using `pycodestyle`).
