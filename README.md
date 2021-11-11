@@ -6,7 +6,7 @@ This project started as a custom utility for the Creamy Neotokyo servers (hence 
 ![alt text](promo/example_diagram.svg)
 
 ## Foreword of warning
-While automation is nice, a malicious actor could use this updater to execute arbitrary code on the target machine. Be sure to only use remote updater sources that you trust 100%, or maintain your own fork of such resources where you can review and control the updates.
+While automation is nice, a malicious actor could use this updater to execute arbitrary code on the target machine. Be sure to only use updater source lists ("recipes") that you trust 100%, or maintain your own fork of such resources where you can review and control the updates.
 
 ## Installation
 Recommended to [install with pip](https://pip.pypa.io/en/stable/cli/pip_install/), using the _requirements.txt_ file.
