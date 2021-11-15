@@ -10,7 +10,7 @@ import shutil
 import subprocess
 import urllib.request
 
-import yaml
+from strictyaml import load, Map, Str, Int, Seq, YAMLError
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #                                                                             #
@@ -39,14 +39,22 @@ import yaml
 #                                                        #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-CFG_FILE = open("config.yml")
-CFG = yaml.safe_load(CFG_FILE)
+CFG = None
+with open("config.yml", "r") as f:
+    YAML_CFG_SCHEMA = Map({
+        "game_dir": Str(),
+        "encoding": Str(),
+        "verbosity": Int(),
+        "recipes": Seq(Str())
+    })
+    CFG = load(f.read(), YAML_CFG_SCHEMA)
+assert CFG is not None
 
 # Relative path to the server's "addons/sourcemod/plugins" directory.
-PLUGINS_LOCAL_PATH = os.path.join(".", CFG["game_dir"], "addons",
+PLUGINS_LOCAL_PATH = os.path.join(".", CFG["game_dir"].value, "addons",
                                   "sourcemod", "plugins")
 # Relative path to the server's "addons/sourcemod/scripting" directory.
-SCRIPTING_LOCAL_PATH = os.path.join(".", CFG["game_dir"], "addons",
+SCRIPTING_LOCAL_PATH = os.path.join(".", CFG["game_dir"].value, "addons",
                                     "sourcemod", "scripting")
 # Relative path to the server's code includes directory.
 INCLUDES_LOCAL_PATH = os.path.join(SCRIPTING_LOCAL_PATH, "include")
@@ -63,7 +71,7 @@ assert os.path.isdir(INCLUDES_LOCAL_PATH)
 assert os.path.isdir(PLUGINS_COMPILER_PATH)
 
 SCRIPT_NAME = "Creamy SourceMod Updater"
-SCRIPT_VERSION = "1.0.0"
+SCRIPT_VERSION = "1.1.0"
 
 
 def get_url_contents(url):
@@ -80,12 +88,12 @@ def get_url_contents(url):
 
 
 def print_info(msg):
-    if CFG["verbosity"] > 0:
+    if CFG["verbosity"].value > 0:
         print(msg)
 
 
 def print_debug(msg):
-    if CFG["verbosity"] > 1:
+    if CFG["verbosity"].value > 1:
         print(msg)
 
 
@@ -101,7 +109,7 @@ def recursive_iter(obj, keys=()):
 
 
 def get_file_hash(file):
-    return get_data_hash(file.read().encode(CFG["encoding"]))
+    return get_data_hash(file.read().encode(CFG["encoding"].value))
 
 
 def get_data_hash(data):
@@ -141,7 +149,7 @@ def self_update(new_version, new_version_url):
         print_info(f"!! Script self-update: version \"{SCRIPT_VERSION}\" --> "
                    f"\"{new_version}\"...")
         f.seek(0)
-        f.write(new_script_data.decode(CFG["encoding"]))
+        f.write(new_script_data.decode(CFG["encoding"].value))
         f.truncate()
         f.flush()
         os.fsync(f)
@@ -160,7 +168,7 @@ def check_for_updates(recipe):
     update_file_contents = get_url_contents(recipe)
     if update_file_contents is None:
         return
-    update_file_contents = update_file_contents.decode(CFG["encoding"])
+    update_file_contents = update_file_contents.decode(CFG["encoding"].value)
     json_data = json.loads(update_file_contents)
 
     num_incs_processed = 0
@@ -229,7 +237,7 @@ def check_for_updates(recipe):
                                 f"include \"{include_name}\"!\n"
                                 "====> Writing source code to disk...")
                     f.seek(0)
-                    f.write(remote_inc.decode(CFG["encoding"]))
+                    f.write(remote_inc.decode(CFG["encoding"].value))
                     f.truncate()
                     f.flush()
                     os.fsync(f)
@@ -291,7 +299,7 @@ def check_for_updates(recipe):
                                 f"plugin \"{plugin_name}\"!\n"
                                 "====> Writing source code to disk...")
                     f.seek(0)
-                    f.write(remote_code.decode(CFG["encoding"]))
+                    f.write(remote_code.decode(CFG["encoding"].value))
                     f.truncate()
                     f.flush()
                     os.fsync(f)
@@ -354,11 +362,9 @@ and trying to move the .smx from \"{plugin_binary_path}\" to
 def main():
     print_info(f"=== Running {SCRIPT_NAME}, v.{SCRIPT_VERSION} ===\n"
                f"Current time: {datetime.now()}")
-    for recipe in CFG["recipes"]:
+    for recipe in CFG["recipes"].data:
         check_for_updates(recipe)
 
 
 if __name__ == '__main__':
     main()
-
-CFG_FILE.close()
