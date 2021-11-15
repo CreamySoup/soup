@@ -1,7 +1,7 @@
 {
 	"updater": [
 		{
-			"version": "1.0.0",
+			"version": "1.1.0",
 			"url": "https://raw.githubusercontent.com/CreamySoup/soup/main/soup.py"
 		}
 	]
