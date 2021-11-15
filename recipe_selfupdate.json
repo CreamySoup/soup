@@ -1,8 +1,8 @@
 {
-	"updater": [
-		{
-			"version": "1.1.0",
-			"url": "https://raw.githubusercontent.com/CreamySoup/soup/main/soup.py"
-		}
-	]
+    "updater": [
+        {
+            "version": "1.1.0",
+            "url": "https://cdn.jsdelivr.net/gh/CreamySoup/soup@main/soup.py"
+        }
+    ]
 }
