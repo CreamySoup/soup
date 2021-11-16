@@ -109,4 +109,4 @@ If the recipe remote assets reside inside GitHub or similar repository host, it'
 The script can be run manually with `python soup.py`, but is recommended to be automated as a [cron job](https://en.wikipedia.org/wiki/Cron) or similar.
 
 ## For developers
-The _soup.py_ Python script should be [PEP 8](https://www.python.org/dev/peps/pep-0008/) compliant (tested using `pycodestyle`).
+Issue tickets and pull requests are welcome! If you would like to edit the Python script(s) in this project, note that they should remain [PEP 8](https://www.python.org/dev/peps/pep-0008/) compliant (tested using `pycodestyle`).
