@@ -103,6 +103,8 @@ There are three valid recipe sections: _updater_, _includes_, and _plugins_. Exa
 
 For full examples of valid recipes, see the [self updater](recipe_selfupdate.json) in this repo, and the [Neotokyo recipe](https://github.com/CreamySoup/recipe-neotokyo) repository. By default, this repo is configured for game "NeotokyoSource", and to use these Neotokyo default recipes.
 
+Recipe URLs are required to use the `https://` URI scheme, in other words plaintext HTTP connections are not allowed.
+
 If the recipe remote assets reside inside GitHub or similar repository host, it's recommended to use a CDN instead of hotlinking the repo directly for better uptime and performance. For example, using [jsDelivr](https://github.com/jsdelivr/jsdelivr), the raw GitHub URL `https://raw.githubusercontent.com/CreamySoup/soup/main/recipe_selfupdate.json` would turn into `https://cdn.jsdelivr.net/gh/CreamySoup/soup@main/recipe_selfupdate.json`.
 
 ## Usage
