@@ -1,4 +1,11 @@
 NeotokyoSource/
+Pipfile
+Pipfile.lock
+
+##############################################################################
+# Ignores below this comment are from:
+# https://raw.githubusercontent.com/github/gitignore/master/Python.gitignore
+##############################################################################
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
