@@ -71,10 +71,13 @@ assert os.path.isdir(INCLUDES_LOCAL_PATH)
 assert os.path.isdir(PLUGINS_COMPILER_PATH)
 
 SCRIPT_NAME = "Creamy SourceMod Updater"
-SCRIPT_VERSION = "1.1.0"
+SCRIPT_VERSION = "1.2.0"
 
 
 def get_url_contents(url):
+    # Require TLS for anti-tamper.
+    # Only checking URI scheme and trusting the request lib to handle the rest.
+    assert url.startswith("https://")
     try:
         return urllib.request.urlopen(url).read()
     except urllib.error.HTTPError as e:
