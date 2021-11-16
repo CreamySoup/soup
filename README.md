@@ -71,8 +71,8 @@ There are three valid recipe sections: _updater_, _includes_, and _plugins_. Exa
 ```json
 	"updater": [
 		{
-			"version": "1.0.0",
-			"url": "https://raw.githubusercontent.com/CreamySoup/soup/main/soup.py"
+			"version": "1.1.0",
+			"url": "https://cdn.jsdelivr.net/gh/CreamySoup/soup@main/soup.py"
 		}
 	]
 ```
@@ -84,7 +84,7 @@ There are three valid recipe sections: _updater_, _includes_, and _plugins_. Exa
 		{
 			"name": "neotokyo",
 			"about": "sourcemod-nt-include - The de facto NT standard include.",
-			"source_url": "https://raw.githubusercontent.com/CreamySoup/sourcemod-nt-include/master/scripting/include/neotokyo.inc"
+			"source_url": "https://cdn.jsdelivr.net/gh/CreamySoup/sourcemod-nt-include@master/scripting/include/neotokyo.inc"
 		}
 	]
 ```
@@ -96,12 +96,14 @@ There are three valid recipe sections: _updater_, _includes_, and _plugins_. Exa
 		{
 			"name": "nt_srs_limiter",
 			"about": "SRS rof limiter timed from time of shot, inspired by Rain's nt_quickswitchlimiter.",
-			"source_url": "https://raw.githubusercontent.com/CreamySoup/nt-srs-limiter/master/scripting/nt_srs_limiter.sp"
+			"source_url": "https://cdn.jsdelivr.net/gh/CreamySoup/nt-srs-limiter@master/scripting/nt_srs_limiter.sp"
 		}
 	]
 ```
 
 For full examples of valid recipes, see the [self updater](recipe_selfupdate.json) in this repo, and the [Neotokyo recipe](https://github.com/CreamySoup/recipe-neotokyo) repository. By default, this repo is configured for game "NeotokyoSource", and to use these Neotokyo default recipes.
+
+If the recipe remote assets reside inside GitHub or similar repository host, it's recommended to use a CDN instead of hotlinking the repo directly for better uptime and performance. For example, using [jsDelivr](https://github.com/jsdelivr/jsdelivr), the raw GitHub URL `https://raw.githubusercontent.com/CreamySoup/soup/main/recipe_selfupdate.json` would turn into `https://cdn.jsdelivr.net/gh/CreamySoup/soup@main/recipe_selfupdate.json`.
 
 ## Usage
 The script can be run manually with `python soup.py`, but is recommended to be automated as a [cron job](https://en.wikipedia.org/wiki/Cron) or similar.
