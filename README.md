@@ -24,7 +24,7 @@ You can also host your own custom _recipes_ as you like for any SRCDS+SourceMod 
 While automation is nice, a malicious actor could use this updater to execute arbitrary code on the target machine. Be sure to only use updater source lists ("recipes") that you trust 100%, or maintain your own fork of such resources where you can review and control the updates.
 
 ## Installation
-Recommended to [install with pip](https://pip.pypa.io/en/stable/cli/pip_install/), using the _requirements.txt_ file.
+It is recommended to use the [latest release](https://github.com/CreamySoup/soup/releases), and [install with pip](https://pip.pypa.io/en/stable/cli/pip_install/), using the _requirements.txt_ file.
 
 You should also consider using a [pipenv](https://github.com/pypa/pipenv) or [virtual environment](https://docs.python.org/3/library/venv.html) to isolate any Python dependencies from the rest of the system (although if you go this route, any cron job or similar automation should also run inside that env to have access to those deps).
 
