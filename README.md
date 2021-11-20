@@ -3,7 +3,7 @@ CreamySoup/"Creamy SourceMod Updater" (or just **_soup_** for short), a helper s
 
 This project started as a custom utility for the Creamy Neotokyo servers (hence the name), but open sourcing and generalising it for any kind of SRCDS/SourceMod servers seemed like a good idea, in case it's helpful for someone else too.
 
-![alt text](promo/example_diagram.svg)
+![Diagram overview](promo/example_diagram.svg)
 
 ## FAQ
 ### What it be?
