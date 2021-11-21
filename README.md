@@ -1,3 +1,6 @@
+[![PEP8](https://img.shields.io/badge/code%20style-pep8-orange.svg)](https://www.python.org/dev/peps/pep-0008/)
+[![MIT](https://img.shields.io/github/license/CreamySoup/soup)](LICENSE)
+
 # soup
 CreamySoup/"Creamy SourceMod Updater" (or just **_soup_** for short), a helper script for automated SourceMod plugin updates management.
 
