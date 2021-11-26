@@ -37,8 +37,12 @@ You should also consider using a [pipenv](https://github.com/pypa/pipenv) or [vi
 * Python 3
 
 ## Config
-Configuration can be edited in the [_config.yml_](config.yml) file that exists in the same dir as the Python script itself.
+Configuration can be edited in the [_config.yml_](config.yml) file that exists in OS config file location, or as defined by the `SOUP_CFG_DIR` environment variable.
 Please see the additional comments within the config file for more information on the options.
+
+OS config file locations:
+* Linux: `~/.config/soup/config.yml`
+* Windows: `%LOCALAPPDATA%\soup\soup\config.yml`
 
 ### Recipes
 The most powerful config option is `recipes`, which is a list of 0 or more URLs pointing to soup.py "recipes".

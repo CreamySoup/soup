@@ -10,6 +10,7 @@ import shutil
 import subprocess
 import urllib.request
 
+from appdirs import *
 from strictyaml import load, Map, Str, Int, Seq, YAMLError
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -39,8 +40,8 @@ from strictyaml import load, Map, Str, Int, Seq, YAMLError
 #                                                        #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-CFG = None
-with open("config.yml", "r") as f:
+CFG_DIR = os.environ.get("SOUP_CFG_DIR") or user_config_dir("soup")
+with open(os.path.join(CFG_DIR, "config.yml"), "r") as f:
     YAML_CFG_SCHEMA = Map({
         "game_dir": Str(),
         "encoding": Str(),
@@ -71,7 +72,7 @@ assert os.path.isdir(INCLUDES_LOCAL_PATH)
 assert os.path.isdir(PLUGINS_COMPILER_PATH)
 
 SCRIPT_NAME = "Creamy SourceMod Updater"
-SCRIPT_VERSION = "1.2.0"
+SCRIPT_VERSION = "1.2.1"
 
 
 def get_url_contents(url):
