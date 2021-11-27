@@ -33,6 +33,28 @@ It is recommended to use the [latest release](https://github.com/CreamySoup/soup
 
 You should also consider using a [pipenv](https://github.com/pypa/pipenv) or [virtual environment](https://docs.python.org/3/library/venv.html) to isolate any Python dependencies from the rest of the system (although if you go this route, any cron job or similar automation should also run inside that env to have access to those deps).
 
+Example (Linux):
+```sh
+whereis python # system Python install location
+
+# Create a Python virtual environment
+pip3 install --user --upgrade pipenv && pipenv --three
+
+# Enter the virtual environment
+pipenv --shell
+
+whereis python # venv Python install location
+
+# Install requirements from requirements.txt
+pipenv install
+
+# Run the script
+python ./soup
+
+# Exit virtual environment
+exit
+```
+
 ### Other requirements
 * Python 3
 
