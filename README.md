@@ -14,7 +14,7 @@ This project started as a custom utility for the Creamy Neotokyo servers (hence 
 
 It parses _soup recipes_, remote lists of resources to be kept up-to-date, compares those resources' contents to the target machine's local files, and re-downloads & re-compiles them if they differ. This will automatically keep such resources in-sync with their remote repository. For a SourceMod plugin, this means any new updates get automatically applied upon the next mapchange after the completion of a _soup_ update cycle.
 
-The purpose of _soup_ is to reduce SRCDS sysop workload by making SourceMod plugin updates more automated, while also providing some granularity in terms of which plugins get updated when, with the introduction of maintained/curated _recipes_. For example, you can have some trusted _recipes_ auto-update their target plugins without any admin intervention, but choose to manually update more fragile or experimental plugins as required (or not at all).
+The purpose of _soup_ is to reduce SRCDS sysop workload by making SourceMod plugin updates more automated, while also providing some granularity in terms of which plugins get updated when, with the introduction of aforementioned _recipes_, and the ability to maintain/curate them individually. For example, you can have some trusted _recipes_ auto-update their target plugins without any admin intervention, but choose to manually update more fragile or experimental plugins as required (or not at all).
 
 ### Which recipes to use?
 You should always use the [default self-updater recipe](recipe_selfupdate.json) to keep the _soup_ script itself updated.
