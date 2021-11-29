@@ -1,9 +1,13 @@
+# Test SM installation
 NeotokyoSource/
+# Temp backups
+bak/
+# Don't store requirements installation stuff
 Pipfile
 Pipfile.lock
 
 ##############################################################################
-# Ignores below this comment are from:
+# Ignores below this comment block are from GitHub's .gitignore templates repo:
 # https://raw.githubusercontent.com/github/gitignore/master/Python.gitignore
 ##############################################################################
 
