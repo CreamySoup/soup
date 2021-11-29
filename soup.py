@@ -136,11 +136,11 @@ def self_update():
         return
 
     print_info(f"!! Script self-update: version \"{SCRIPT_VERSION}\" --> "
-               f"\"{latest_tag}\"...")
+               f"\"{latest_ver}\"...")
 
     zip_url = json_latest_release.get("zipball_url")
 
-    release_commit_url = f"{GH_REPO_BASE}/git/ref/tags/{latest_tag}"
+    release_commit_url = f"{GH_REPO_BASE}/git/ref/tags/{latest_ver}"
     release_commit_json = json.loads(get_url_contents(release_commit_url))
     hash_cutoff_point = 7
     sha = release_commit_json["object"]["sha"][:hash_cutoff_point]
