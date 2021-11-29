@@ -83,7 +83,7 @@ GH_REPO_BASE = f"{GH_API_URL}/repos/{GH_REPO_OWNER}/{GH_REPO_NAME}"
 GH_RELEASES = f"{GH_REPO_BASE}/releases/latest"
 
 SCRIPT_NAME = "Creamy SourceMod Updater"
-SCRIPT_VERSION = semver.VersionInfo.parse("1.4.4")
+SCRIPT_VERSION = semver.VersionInfo.parse("1.4.5")
 
 
 def get_url_contents(url):
@@ -172,7 +172,8 @@ def self_update():
 
     # We have modified our own source code - restart the script
     print_info("!!! Restarting soup...")
-    os.execv(sys.executable, ['python'] + sys.argv)
+    subprocess.check_call([sys.executable, ] + sys.argv)
+    sys.exit(0)
 
 
 def check_for_updates(recipe):
