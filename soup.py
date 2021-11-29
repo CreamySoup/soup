@@ -83,7 +83,7 @@ GH_REPO_BASE = f"{GH_API_URL}/repos/{GH_REPO_OWNER}/{GH_REPO_NAME}"
 GH_RELEASES = f"{GH_REPO_BASE}/releases/latest"
 
 SCRIPT_NAME = "Creamy SourceMod Updater"
-SCRIPT_VERSION = semver.VersionInfo.parse("1.4.0")
+SCRIPT_VERSION = semver.VersionInfo.parse("1.4.3")
 
 
 def get_url_contents(url):
@@ -157,7 +157,7 @@ def self_update():
             f.write(z.open(ballname_reqs).read())
             f.truncate()
             f.flush()
-            os.fsync(f)
+            os.fsync(f.fileno())
 
         subprocess.run("pipenv install -r requirements.txt").check_returncode()
 
@@ -166,7 +166,7 @@ def self_update():
             f.write(z.open(ballname_soup).read())
             f.truncate()
             f.flush()
-            os.fsync(f)
+            os.fsync(f.fileno())
 
     print_info("!! Self-update successful.")
 
