@@ -3,15 +3,20 @@
 from __future__ import print_function
 
 from datetime import datetime
+from io import BytesIO
 import hashlib
 import json
 import os
 import shutil
 import subprocess
+import sys
+import zipfile
 import urllib.request
 
 from appdirs import *
 from strictyaml import load, Map, Str, Int, Seq, YAMLError
+
+import semver
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #                                                                             #
@@ -71,8 +76,14 @@ assert os.path.isdir(SCRIPTING_LOCAL_PATH)
 assert os.path.isdir(INCLUDES_LOCAL_PATH)
 assert os.path.isdir(PLUGINS_COMPILER_PATH)
 
+GH_API_URL = "https://api.github.com"
+GH_REPO_OWNER = "CreamySoup"
+GH_REPO_NAME = "soup"
+GH_REPO_BASE = f"{GH_API_URL}/repos/{GH_REPO_OWNER}/{GH_REPO_NAME}"
+GH_RELEASES = f"{GH_REPO_BASE}/releases/latest"
+
 SCRIPT_NAME = "Creamy SourceMod Updater"
-SCRIPT_VERSION = "1.3.0"
+SCRIPT_VERSION = semver.VersionInfo.parse("1.4.0")
 
 
 def get_url_contents(url):
@@ -101,17 +112,6 @@ def print_debug(msg):
         print(msg)
 
 
-def recursive_iter(obj, keys=()):
-    if isinstance(obj, dict):
-        for k, v in obj.items():
-            yield from recursive_iter(v, keys + (k,))
-    elif any(isinstance(obj, t) for t in (list, tuple)):
-        for idx, item in enumerate(obj):
-            yield from recursive_iter(item, keys + (idx,))
-    else:
-        yield keys, obj
-
-
 def get_file_hash(file):
     return get_data_hash(file.read().encode(CFG["encoding"].value))
 
@@ -123,59 +123,60 @@ def get_data_hash(data):
 
 
 # Check for updates of this script itself
-def self_update(new_version, new_version_url):
-    assert new_version is not None and new_version_url is not None
+def self_update():
+    print_info(f"=> Self-update check")
 
-    if new_version_url.endswith("/"):
-        new_version_url = new_version_url[:-1]
+    json_latest_release = json.loads(get_url_contents(GH_RELEASES))
+    latest_ver = semver.VersionInfo.parse(json_latest_release.get("tag_name"))
 
-    new_script_data = get_url_contents(f"{new_version_url}/soup.py")
-    new_script_reqs = get_url_contents(f"{new_version_url}/requirements.txt")
-
-    # If we got None and haven't yet raised an error, it was a remote server
-    # error unrelated to us. Just return early and try again some other time.
-    if new_script_data is None or new_script_reqs is None:
+    if SCRIPT_VERSION >= latest_ver:
+        if SCRIPT_VERSION > latest_ver:
+            print_debug(f"!! Running higher version ({SCRIPT_VERSION}) than "
+                        f"release version ({latest_ver})")
         return
 
-    is_pending_update = False
+    print_info(f"!! Script self-update: version \"{SCRIPT_VERSION}\" --> "
+               f"\"{latest_tag}\"...")
 
-    # For compat with some Windows tools. Can use plain \n if working on this
-    # file on purely on Unix. This matters here, because we're hashing the file
-    # contents to check for updates.
-    this_newline = "\r\n"
+    zip_url = json_latest_release.get("zipball_url")
 
-    with open(os.path.realpath(__file__), "r", newline=this_newline) as f:
-        current_script_hash = get_file_hash(f)
-        assert current_script_hash is not None
-        new_script_hash = get_data_hash(new_script_data)
-        is_pending_update = current_script_hash != new_script_hash
+    release_commit_url = f"{GH_REPO_BASE}/git/ref/tags/{latest_tag}"
+    release_commit_json = json.loads(get_url_contents(release_commit_url))
+    hash_cutoff_point = 7
+    sha = release_commit_json["object"]["sha"][:hash_cutoff_point]
 
-    if not is_pending_update:
-        return
+    ballname_soup = f"{GH_REPO_OWNER}-{GH_REPO_NAME}-{sha}/soup.py"
+    ballname_reqs = f"{GH_REPO_OWNER}-{GH_REPO_NAME}-{sha}/requirements.txt"
 
-    # Update Python requirements first
-    subprocess.run("pipenv install -r requirements.txt").check_returncode()
+    with zipfile.ZipFile(BytesIO(urllib.request.urlopen(zip_url).read())) as z:
+        realpath = os.path.realpath(__file__)
 
-    # Do the actual file update here
-    with open(os.path.realpath(__file__), "w+", newline="\n") as f:
-        print_info(f"!! Script self-update: version \"{SCRIPT_VERSION}\" --> "
-                   f"\"{new_version}\"...")
-        f.seek(0)
-        f.write(new_script_data.decode(CFG["encoding"].value))
-        f.truncate()
-        f.flush()
-        os.fsync(f)
+        with open(os.path.join(os.path.dirname(realpath), "requirements.txt"),
+                  "wb+") as f:
+            f.seek(0)
+            f.write(z.open(ballname_reqs).read())
+            f.truncate()
+            f.flush()
+            os.fsync(f)
 
-    # Re-open the file after the update to confirm it was written successfully
-    with open(os.path.realpath(__file__), "r", newline=this_newline) as f:
-        current_script_hash = get_file_hash(f)
-        assert current_script_hash is not None
-        assert current_script_hash == new_script_hash
-        print_info("!! Self-update successful.")
+        subprocess.run("pipenv install -r requirements.txt").check_returncode()
+
+        with open(realpath, "wb+") as f:
+            f.seek(0)
+            f.write(z.open(ballname_soup).read())
+            f.truncate()
+            f.flush()
+            os.fsync(f)
+
+    print_info("!! Self-update successful.")
+
+    # We have modified our own source code - restart the script
+    print_info("!!! Restarting soup...")
+    os.execv(sys.executable, ['python'] + sys.argv)
 
 
 def check_for_updates(recipe):
-    print_info(f"=> Checking for updates: {recipe}")
+    print_info(f"=> Checking for recipe updates: {recipe}")
 
     update_file_contents = get_url_contents(recipe)
     if update_file_contents is None:
@@ -189,191 +190,204 @@ def check_for_updates(recipe):
     num_plugins_processed = 0
     num_plugins_updated = 0
 
-    for k, value in recursive_iter(json_data):
-        root_section = k[0]
-        index = k[1]
-        key = k[2]
-
-        assert root_section == "updater" \
-            or root_section == "includes" \
-            or root_section == "plugins"
-
+    root_sections = ["includes", "plugins", "updater"]
+    for root_section in root_sections:
+        kvs = json_data.get(root_section)
+        if kvs is None:
+            continue
         if root_section == "updater":
-            assert key == "version" or key == "url"
+            print(f"==> ! Warning: config key '{root_section}' has been "
+                  "deprecated! Please update your config file.")
+            continue
+        for kv in kvs:
+            if kv is None:
+                continue
+            for index, (key, value) in enumerate(kv.items(), start=1):
+                if root_section == "includes":
+                    if key == "name":
+                        include_name = value
+                        local_inc_path = os.path.join(INCLUDES_LOCAL_PATH,
+                                                      (value + ".inc"))
+                        inc_exists_locally = os.path.isfile(local_inc_path)
+                        num_incs_processed += 1
 
-            if key == "version":
-                new_version = value
-            elif key == "url":
-                new_version_url = value
-                self_update(new_version, new_version_url)
+                    print_debug(f"=> Include {key}: \"{value}\"")
 
-        elif root_section == "includes":
-            if key == "name":
-                include_name = value
-                print_debug("- - - - - - - - - - - - - - - - - - - -\n"
-                            f"* Processing include # {index + 1}.")
-                local_inc_path = os.path.join(INCLUDES_LOCAL_PATH,
-                                              (value + ".inc"))
-                inc_exists_locally = os.path.isfile(local_inc_path)
-                num_incs_processed += 1
+                    if key == "source_url":
+                        remote_inc = get_url_contents(value)
+                        if remote_inc is None:
+                            print("==> ! Failed to get remote include for "
+                                  f"{include_name}, skipping its update for "
+                                  "now.")
+                            continue
+                        remote_inc_hash = get_data_hash(remote_inc)
+                        print_debug("==> Include code remote hash: "
+                                    f"{remote_inc_hash}")
 
-            print_debug(f"=> Include {key}: \"{value}\"")
+                        open_mode = "r+" if inc_exists_locally else "w"
+                        f = open(local_inc_path, open_mode, newline="\n")
 
-            if key == "source_url":
-                remote_inc = get_url_contents(value)
-                if remote_inc is None:
-                    print("==> ! Failed to get remote include for "
-                          f"{include_name}, skipping its update for now.")
-                    continue
-                remote_inc_hash = get_data_hash(remote_inc)
-                print_debug("==> Include code remote hash: "
-                            f"{remote_inc_hash}")
+                        if inc_exists_locally:
+                            local_inc_hash = get_file_hash(f)
+                            print_debug("==> Include code local hash: "
+                                        f"{local_inc_hash}")
 
-                open_mode = "r+" if inc_exists_locally else "w"
-                f = open(local_inc_path, open_mode, newline="\n")
+                        hashes_match = (inc_exists_locally and
+                                        local_inc_hash == remote_inc_hash)
 
-                if inc_exists_locally:
-                    local_inc_hash = get_file_hash(f)
-                    print_debug("==> Include code local hash: "
-                                f"{local_inc_hash}")
+                        if hashes_match:
+                            print_debug("===> Source code hashes are "
+                                        "identical; no need to update include "
+                                        f"\"{include_name}\".")
+                        else:
+                            print_debug("===> Source code hashes differ; "
+                                        f"updating include \"{include_name}"
+                                        "\"!\n"
+                                        "====> Writing source code to disk...")
+                            f.seek(0)
+                            f.write(remote_inc.decode(CFG["encoding"].value))
+                            f.truncate()
+                            f.flush()
+                            os.fsync(f)
+                        f.close()
 
-                hashes_match = (inc_exists_locally and
-                                local_inc_hash == remote_inc_hash)
+                        if not hashes_match:
+                            print_debug("====> Verifying include code "
+                                        "integrity...")
+                            assert os.path.isfile(local_inc_path)
+                            with open(local_inc_path, "r", newline="\n") as f:
+                                new_local_inc_hash = get_file_hash(f)
 
-                if hashes_match:
-                    print_debug("===> Source code hashes are identical; "
-                                "no need to update include "
-                                f"\"{include_name}\".")
-                else:
-                    print_debug("===> Source code hashes differ; updating "
-                                f"include \"{include_name}\"!\n"
-                                "====> Writing source code to disk...")
-                    f.seek(0)
-                    f.write(remote_inc.decode(CFG["encoding"].value))
-                    f.truncate()
-                    f.flush()
-                    os.fsync(f)
-                f.close()
+                            hashes_match = \
+                                (new_local_inc_hash == remote_inc_hash)
 
-                if not hashes_match:
-                    print_debug("====> Verifying include code integrity...")
-                    assert os.path.isfile(local_inc_path)
-                    with open(local_inc_path, "r", newline="\n") as f:
-                        new_local_inc_hash = get_file_hash(f)
-                    hashes_match = (new_local_inc_hash == remote_inc_hash)
-                    assert hashes_match, (new_local_inc_hash +
-                                          " should equal " + remote_inc_hash)
+                            assert hashes_match, \
+                                (f"{new_local_inc_hash} should equal "
+                                 f"{remote_inc_hash}")
 
-                    print_debug("====> Finished updating include "
-                                f"\"{include_name}\". This new version will "
-                                "be used for any future plugin compiles that "
-                                "require it.")
+                            print_debug("====> Finished updating include "
+                                        f"\"{include_name}\". This new "
+                                        "version will be used for any future "
+                                        "plugin compiles that require it.")
 
-                    num_incs_updated += 1
+                            num_incs_updated += 1
 
-        else:  # plugins
-            if key == "name":
-                plugin_name = value
-                print_debug("- - - - - - - - - - - - - - - - - - - -"
-                            f"* Processing plugin # {index + 1}.")
-                local_source_path = os.path.join(SCRIPTING_LOCAL_PATH,
-                                                 (value + ".sp"))
-                code_exists_locally = os.path.isfile(local_source_path)
-                num_plugins_processed += 1
+                else:  # plugins
+                    if key == "name":
+                        plugin_name = value
+                        local_source_path = os.path.join(SCRIPTING_LOCAL_PATH,
+                                                         (value + ".sp"))
+                        code_exists_locally = os.path.isfile(local_source_path)
+                        num_plugins_processed += 1
 
-            print_debug(f"=> Plugin {key}: \"{value}\"")
+                    print_debug(f"=> Plugin {key}: \"{value}\"")
 
-            if key == "source_url":
-                remote_code = get_url_contents(value)
-                if remote_code is None:
-                    print("==> ! Failed to get remote code for "
-                          f"{plugin_name}, skipping its update for now.")
-                    continue
-                remote_code_hash = get_data_hash(remote_code)
-                print_debug(f"==> Plugin code remote hash: {remote_code_hash}")
+                    if key == "source_url":
+                        remote_code = get_url_contents(value)
+                        if remote_code is None:
+                            print("==> ! Failed to get remote code for "
+                                  f"{plugin_name}, skipping its update for "
+                                  "now.")
+                            continue
+                        remote_code_hash = get_data_hash(remote_code)
+                        print_debug("==> Plugin code remote hash: "
+                                    f"{remote_code_hash}")
 
-                open_mode = "r+" if code_exists_locally else "w"
-                f = open(local_source_path, open_mode, newline="\n")
+                        open_mode = "r+" if code_exists_locally else "w"
+                        f = open(local_source_path, open_mode, newline="\n")
 
-                if code_exists_locally:
-                    local_code_hash = get_file_hash(f)
-                    print_debug("==> Plugin code local hash: "
-                                f"{local_code_hash}")
+                        if code_exists_locally:
+                            local_code_hash = get_file_hash(f)
+                            print_debug("==> Plugin code local hash: "
+                                        f"{local_code_hash}")
 
-                hashes_match = (code_exists_locally and
-                                local_code_hash == remote_code_hash)
+                        hashes_match = (code_exists_locally and
+                                        local_code_hash == remote_code_hash)
 
-                if hashes_match:
-                    print_debug("===> Source code hashes are identical; "
-                                f"no need to update plugin \"{plugin_name}\".")
-                else:
-                    print_debug("===> Source code hashes differ; updating "
-                                f"plugin \"{plugin_name}\"!\n"
-                                "====> Writing source code to disk...")
-                    f.seek(0)
-                    f.write(remote_code.decode(CFG["encoding"].value))
-                    f.truncate()
-                    f.flush()
-                    os.fsync(f)
-                f.close()
+                        if hashes_match:
+                            print_debug("===> Source code hashes are "
+                                        "identical; no need to update plugin "
+                                        f"\"{plugin_name}\".")
+                        else:
+                            print_debug("===> Source code hashes differ; "
+                                        f"updating plugin \"{plugin_name}\"!\n"
+                                        "====> Writing source code to disk...")
+                            f.seek(0)
+                            f.write(remote_code.decode(CFG["encoding"].value))
+                            f.truncate()
+                            f.flush()
+                            os.fsync(f)
+                        f.close()
 
-                if not hashes_match:
-                    print_debug("====> Verifying plugin code integrity...")
-                    assert os.path.isfile(local_source_path)
-                    with open(local_source_path, "r", newline="\n") as f:
-                        new_local_code_hash = get_file_hash(f)
-                    hashes_match = (new_local_code_hash == remote_code_hash)
-                    assert hashes_match, (new_local_code_hash +
-                                          " should equal " + remote_code_hash)
+                        if not hashes_match:
+                            print_debug("====> Verifying plugin code "
+                                        "integrity...")
+                            assert os.path.isfile(local_source_path)
 
-                    print_debug("====> Compiling plugin "
-                                f"\"{plugin_name}\"...\n")
+                            with open(local_source_path, "r",
+                                      newline="\n") as f:
+                                new_local_code_hash = get_file_hash(f)
 
-                    platform_is_windows = (os.name == "nt")
+                            hashes_match = \
+                                (new_local_code_hash == remote_code_hash)
 
-                    # Assuming here that any non-Windows platform is Linux,
-                    # or uses a Linux style spcomp binary.
-                    compiler_binary = "spcomp.exe" if platform_is_windows \
-                        else "spcomp"
+                            assert hashes_match, \
+                                (f"{new_local_code_hash} "
+                                 f"should equal {remote_code_hash}")
 
-                    compiler_path = os.path.join(PLUGINS_COMPILER_PATH,
-                                                 compiler_binary)
-                    assert os.path.isfile(compiler_path)
-                    subprocess.run(
-                        [compiler_path, local_source_path]).check_returncode()
+                            print_debug("====> Compiling plugin "
+                                        f"\"{plugin_name}\"...\n")
 
-                    print_debug(f"\n====> Installing plugin \"{plugin_name}\""
-                                "...")
+                            platform_is_windows = (os.name == "nt")
 
-                    plugin_binary_path = os.path.join(".",
-                                                      (plugin_name + ".smx"))
-                    assert os.path.isfile(plugin_binary_path)
+                            # Assuming here that any non-Windows platform is
+                            # Linux, or uses a Linux style spcomp binary.
+                            compiler_binary = "spcomp.exe" if \
+                                platform_is_windows else "spcomp"
 
-                    '''
-                    print(f"""Current working directory is \"{os.getcwd()}\"
-and trying to move the .smx from \"{plugin_binary_path}\" to
-{os.path.join(PLUGINS_LOCAL_PATH, (plugin_name + ".smx"))}""")
-                    '''
+                            compiler_path = os.path.join(PLUGINS_COMPILER_PATH,
+                                                         compiler_binary)
+                            assert os.path.isfile(compiler_path)
 
-                    shutil.move(plugin_binary_path,
-                                os.path.join(PLUGINS_LOCAL_PATH,
-                                             (plugin_name + ".smx")))
+                            subprocess.run(
+                                [compiler_path,
+                                 local_source_path]).check_returncode()
 
-                    print_debug("====> Finished updating plugin "
-                                f"\"{plugin_name}\". It will be reloaded by "
-                                "the server on the next mapchange.")
+                            print_debug("\n====> Installing plugin "
+                                        f"\"{plugin_name}\"...")
 
-                    num_plugins_updated += 1
+                            plugin_binary_path = os.path.join(".",
+                                                              f"{plugin_name}"
+                                                              ".smx")
+                            assert os.path.isfile(plugin_binary_path)
 
-    print_info(f"\n{num_incs_updated} of {num_incs_processed} includes "
-               "checked had received new updates.\n"
-               f"{num_plugins_updated} of {num_plugins_processed} plugins "
-               "checked had received new updates.")
+                            '''
+                            print(f"""Current working directory is "
+\"{os.getcwd()}\" and trying to move the .smx from \"{plugin_binary_path}\"
+to {os.path.join(PLUGINS_LOCAL_PATH, (plugin_name + ".smx"))}""")
+                            '''
+
+                            shutil.move(plugin_binary_path,
+                                        os.path.join(PLUGINS_LOCAL_PATH,
+                                                     (plugin_name + ".smx")))
+
+                            print_debug("====> Finished updating plugin "
+                                        f"\"{plugin_name}\". It will be "
+                                        "reloaded by the server on the next "
+                                        "mapchange.")
+
+                            num_plugins_updated += 1
+
+    print_info(f"\n{num_incs_updated} of {num_incs_processed} "
+               "includes checked had received new updates.\n"
+               f"{num_plugins_updated} of {num_plugins_processed} "
+               "plugins checked had received new updates.")
 
 
 def main():
     print_info(f"=== Running {SCRIPT_NAME}, v.{SCRIPT_VERSION} ===\n"
                f"Current time: {datetime.now()}")
+    self_update()
     for recipe in CFG["recipes"].data:
         check_for_updates(recipe)
 
