@@ -33,26 +33,17 @@ It is recommended to use the [latest release](https://github.com/CreamySoup/soup
 
 You should also consider using a [pipenv](https://github.com/pypa/pipenv) or [virtual environment](https://docs.python.org/3/library/venv.html) to isolate any Python dependencies from the rest of the system (although if you go this route, any cron job or similar automation should also run inside that env to have access to those deps).
 
-Example (Linux):
+Example:
 ```sh
-whereis python # system Python install location
+# Install/upgrade pipenv
+pip3 install --user --upgrade pipenv
 
-# Create a Python virtual environment
-pip3 install --user --upgrade pipenv && pipenv --three
+# Install soup.py requirements inside a Python 3 virtual environment
+pipenv install --three
 
-# Enter the virtual environment
-pipenv --shell
-
-whereis python # venv Python install location
-
-# Install requirements from requirements.txt
-pipenv install
-
-# Run the script
-python ./soup
-
-# Exit virtual environment
-exit
+# Run soup.py inside the created virtual env, then exit the virtual env.
+# This would be the cron-scheduled command.
+pipenv run python soup.py
 ```
 
 ### Other requirements
@@ -97,13 +88,13 @@ Note that trailing commas are not allowed in the JSON syntax – it's a good ide
 
 There are three valid recipe sections: _updater_, _includes_, and _plugins_. Examples follow:
 
-* **updater** – A self-updater section for the soup.py script contents. Only one section in total of this kind should exist at most in all of the recipes being used.
+* **updater** – A self-updater section for the soup.py script contents and its _requirements.txt_. Only one section in total of this kind should exist at most in all of the recipes being used. The `url` key should be a partial URL string, which can be appended with `/soup.py` and `/requirements.txt` to fetch those resources.
 
 ```json
 	"updater": [
 		{
-			"version": "1.1.0",
-			"url": "https://cdn.jsdelivr.net/gh/CreamySoup/soup@main/soup.py"
+			"version": "1.3.0",
+			"url": "https://cdn.jsdelivr.net/gh/CreamySoup/soup@main"
 		}
 	]
 ```
