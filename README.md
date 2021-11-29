@@ -55,6 +55,9 @@ You'll also need to move the config.yml to its [expected config location, or set
 
 ## Config
 Configuration can be edited in the [_config.yml_](config.yml) file that exists in OS specific config file location, or as defined by the `SOUP_CFG_DIR` environment variable.
+
+If you would like to use the soup.py folder, set the `SOUP_CFG_DIR` environment variable's value as a dot (`.`).
+
 Please see the additional comments within the config file for more information on the options.
 
 ### OS specific config file locations:
