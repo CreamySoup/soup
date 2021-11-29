@@ -108,7 +108,7 @@ There are three valid recipe sections: _includes_, _plugins_, and _updater_. Exa
 	]
 ```
 
-* **updater** – **Deprecated, does nothing! Do not use as this will get removed.** A self-updater section for the soup.py script contents and its _requirements.txt_. Only one section in total of this kind should exist at most in all of the recipes being used. The `url` key should be a partial URL string, which can be appended with `/soup.py` and `/requirements.txt` to fetch those resources.
+* **updater** – **Deprecated, does nothing! Do not use as this option will get removed in the future.** A self-updater section for the soup.py script contents and its _requirements.txt_. Only one section in total of this kind should exist at most in all of the recipes being used. The `url` key should be a partial URL string, which can be appended with `/soup.py` and `/requirements.txt` to fetch those resources.
 
 ```json
 	"updater": [
@@ -119,7 +119,7 @@ There are three valid recipe sections: _includes_, _plugins_, and _updater_. Exa
 	]
 ```
 
-For full examples of valid recipes, see the [self updater](recipe_selfupdate.json) in this repo, and the [Neotokyo recipe](https://github.com/CreamySoup/recipe-neotokyo) repository. By default, this repo is configured for game "NeotokyoSource", and to use these Neotokyo default recipes.
+For full examples of valid recipes, see the [Neotokyo recipe](https://github.com/CreamySoup/recipe-neotokyo) repository. By default, this soup repo is configured for game "NeotokyoSource", and to use these Neotokyo default recipes.
 
 Recipe URLs are required to use the `https://` URI scheme, in other words plaintext HTTP connections are not allowed.
 
