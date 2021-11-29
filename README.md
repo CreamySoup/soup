@@ -94,7 +94,7 @@ There are three valid recipe sections: _updater_, _includes_, and _plugins_. Exa
 	"updater": [
 		{
 			"version": "1.3.0",
-			"url": "https://cdn.jsdelivr.net/gh/CreamySoup/soup@main"
+			"url": "https://cdn.jsdelivr.net/gh/CreamySoup/soup@1.3.0"
 		}
 	]
 ```
