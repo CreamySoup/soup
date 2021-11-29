@@ -36,7 +36,7 @@ pip3 install --user --upgrade pipenv
 pipenv install --three
 
 # If you want to symbolic link to your SRCDS from the git repo dir:
-# "game_dir", as defined in config.yml.
+# Replace "game_dir", as defined in config.yml.
 ln -s ./game_dir ~/path/to/srcds/game_dir
 #     Windows alternative: mklink /j .\game_dir C:\path\to\srcds\game_dir
 
