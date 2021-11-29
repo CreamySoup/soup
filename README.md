@@ -37,9 +37,11 @@ pipenv install --three
 
 # If you want to symbolic link to your SRCDS from the git repo dir:
 # "game_dir", as defined in config.yml.
-ln -s ./game_dir ~/path/to/srcds/game_dir  # Windows alternative: mklink /j .\game_dir C:\path\to\srcds\game_dir
+ln -s ./game_dir ~/path/to/srcds/game_dir
+#     Windows alternative: mklink /j .\game_dir C:\path\to\srcds\game_dir
 
-# For example of the above, for "NeotokyoSource": ln -s ./NeotokyoSource ~/path/to/srcds/NeotokyoSource
+# For example of the above, for "NeotokyoSource":
+#     ln -s ./NeotokyoSource ~/path/to/srcds/NeotokyoSource
 
 # Run soup.py inside the created virtual env, then exit the virtual env.
 # This would be the cron-scheduled command.
