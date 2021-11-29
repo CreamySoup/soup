@@ -82,18 +82,7 @@ Note that trailing commas are not allowed in the JSON syntax – it's a good ide
 
 #### Recipe sections
 
-There are three valid recipe sections: _updater_, _includes_, and _plugins_. Examples follow:
-
-* **updater** – A self-updater section for the soup.py script contents and its _requirements.txt_. Only one section in total of this kind should exist at most in all of the recipes being used. The `url` key should be a partial URL string, which can be appended with `/soup.py` and `/requirements.txt` to fetch those resources.
-
-```json
-	"updater": [
-		{
-			"version": "1.3.0",
-			"url": "https://cdn.jsdelivr.net/gh/CreamySoup/soup@1.3.0"
-		}
-	]
-```
+There are three valid recipe sections: _includes_, _plugins_, and _updater_. Examples follow:
 
 * **includes** – SourceMod include files that are required by some of the plugins in the recipes' _plugins_ section. Required file extension: .inc
 
@@ -119,6 +108,17 @@ There are three valid recipe sections: _updater_, _includes_, and _plugins_. Exa
 	]
 ```
 
+* **updater** – **Deprecated, does nothing! Do not use as this will get removed.** A self-updater section for the soup.py script contents and its _requirements.txt_. Only one section in total of this kind should exist at most in all of the recipes being used. The `url` key should be a partial URL string, which can be appended with `/soup.py` and `/requirements.txt` to fetch those resources.
+
+```json
+	"updater": [
+		{
+			"version": "1.3.0",
+			"url": "https://cdn.jsdelivr.net/gh/CreamySoup/soup@1.3.0"
+		}
+	]
+```
+
 For full examples of valid recipes, see the [self updater](recipe_selfupdate.json) in this repo, and the [Neotokyo recipe](https://github.com/CreamySoup/recipe-neotokyo) repository. By default, this repo is configured for game "NeotokyoSource", and to use these Neotokyo default recipes.
 
 Recipe URLs are required to use the `https://` URI scheme, in other words plaintext HTTP connections are not allowed.
@@ -129,8 +129,6 @@ If the recipe remote assets reside inside GitHub or similar repository host, it'
 The script can be run manually with `python soup.py`, but is recommended to be automated as a [cron job](https://en.wikipedia.org/wiki/Cron) or similar.
 
 ### Which recipes to use?
-You should always use the [default self-updater recipe](recipe_selfupdate.json) to keep the _soup_ script itself updated.
-
 If you are operating a Neotokyo SRCDS, this project offers [some recommended recipe(s) here](https://github.com/CreamySoup/recipe-neotokyo). This resource is still work-in-progress, more curated lists to be added later!
 
 You can also host your own custom _recipes_ as you like for any SRCDS+SourceMod server setup.
