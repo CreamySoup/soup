@@ -72,7 +72,7 @@ assert os.path.isdir(INCLUDES_LOCAL_PATH)
 assert os.path.isdir(PLUGINS_COMPILER_PATH)
 
 SCRIPT_NAME = "Creamy SourceMod Updater"
-SCRIPT_VERSION = "1.2.1"
+SCRIPT_VERSION = "1.3.0"
 
 
 def get_url_contents(url):
@@ -125,11 +125,16 @@ def get_data_hash(data):
 # Check for updates of this script itself
 def self_update(new_version, new_version_url):
     assert new_version is not None and new_version_url is not None
-    new_script_data = get_url_contents(new_version_url)
+
+    if new_version_url.endswith("/"):
+        new_version_url = new_version_url[:-1]
+
+    new_script_data = get_url_contents(f"{new_version_url}/soup.py")
+    new_script_reqs = get_url_contents(f"{new_version_url}/requirements.txt")
 
     # If we got None and haven't yet raised an error, it was a remote server
     # error unrelated to us. Just return early and try again some other time.
-    if new_script_data is None:
+    if new_script_data is None or new_script_reqs is None:
         return
 
     is_pending_update = False
@@ -147,6 +152,9 @@ def self_update(new_version, new_version_url):
 
     if not is_pending_update:
         return
+
+    # Update Python requirements first
+    subprocess.run("pipenv install -r requirements.txt").check_returncode()
 
     # Do the actual file update here
     with open(os.path.realpath(__file__), "w+", newline="\n") as f:
