@@ -40,7 +40,7 @@ pipenv install --three
 ln -s ./game_dir ~/path/to/srcds/game_dir
 #     Windows alternative: mklink /j .\game_dir C:\path\to\srcds\game_dir
 
-# For example of the above, for "NeotokyoSource":
+# For example of the above, for "game_dir" equals "NeotokyoSource":
 #     ln -s ./NeotokyoSource ~/path/to/srcds/NeotokyoSource
 
 # Run soup.py inside the created virtual env, then exit the virtual env.
