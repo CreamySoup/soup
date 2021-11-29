@@ -16,13 +16,6 @@ It parses _soup recipes_, remote lists of resources to be kept up-to-date, compa
 
 The purpose of _soup_ is to reduce SRCDS sysop workload by making SourceMod plugin updates more automated, while also providing some granularity in terms of which plugins get updated when, with the introduction of aforementioned _recipes_ and the ability to maintain/curate them individually. For example, you could have some trusted _recipes_ auto-update their target plugins without any admin intervention, but choose to manually update more fragile or experimental plugins as required (or not at all).
 
-### Which recipes to use?
-You should always use the [default self-updater recipe](recipe_selfupdate.json) to keep the _soup_ script itself updated.
-
-If you are operating a Neotokyo SRCDS, this project offers [some recommended recipe(s) here](https://github.com/CreamySoup/recipe-neotokyo). This resource is still work-in-progress, more curated lists to be added later!
-
-You can also host your own custom _recipes_ as you like for any SRCDS+SourceMod server setup.
-
 ## Foreword of warning
 While automation is nice, a malicious actor could use this updater to execute arbitrary code on the target machine. Be sure to only use updater source lists ("recipes") that you trust 100%, or maintain your own fork of such resources where you can review and control the updates.
 
@@ -134,6 +127,13 @@ If the recipe remote assets reside inside GitHub or similar repository host, it'
 
 ## Usage
 The script can be run manually with `python soup.py`, but is recommended to be automated as a [cron job](https://en.wikipedia.org/wiki/Cron) or similar.
+
+### Which recipes to use?
+You should always use the [default self-updater recipe](recipe_selfupdate.json) to keep the _soup_ script itself updated.
+
+If you are operating a Neotokyo SRCDS, this project offers [some recommended recipe(s) here](https://github.com/CreamySoup/recipe-neotokyo). This resource is still work-in-progress, more curated lists to be added later!
+
+You can also host your own custom _recipes_ as you like for any SRCDS+SourceMod server setup.
 
 ## For developers
 Issue tickets and pull requests are welcome! If you would like to edit the Python script(s) in this project, please note that they should remain [PEP 8](https://www.python.org/dev/peps/pep-0008/) compliant (no errors when tested using `pycodestyle`).
