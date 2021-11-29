@@ -48,6 +48,12 @@ import semver
 #                                                        #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
+SCRIPT_NAME = "Creamy SourceMod Updater"
+# Note: This plugin uses an auto-updater function reliant on version number,
+# please don't manually modify this version number unless you know
+# that's what you want.
+SCRIPT_VERSION = semver.VersionInfo.parse("1.5.1")
+
 CFG_DIR = os.environ.get("SOUP_CFG_DIR") or user_config_dir("soup")
 with open(os.path.join(CFG_DIR, "config.yml"), "r") as f:
     YAML_CFG_SCHEMA = Map({
@@ -87,9 +93,6 @@ GH_REPO_NAME = "soup"
 GH_REPO_BASE = f"{GH_API_URL}/repos/{GH_REPO_OWNER}/{GH_REPO_NAME}"
 GH_RELEASES = f"{GH_REPO_BASE}/releases/latest"
 assert GH_API_URL.startswith("https://")  # require TLS
-
-SCRIPT_NAME = "Creamy SourceMod Updater"
-SCRIPT_VERSION = semver.VersionInfo.parse("1.5.0")
 
 
 def get_url_contents(url):
