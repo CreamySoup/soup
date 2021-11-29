@@ -29,16 +29,14 @@ While automation is nice, a malicious actor could use this updater to execute ar
 This warning applies not only to the _recipe_ files themselves, but also to any remote resources that those _recipes_ may point to.
 
 ## Installation
-It is recommended to use the [latest release](https://github.com/CreamySoup/soup/releases/latest), and [install with pip](https://pip.pypa.io/en/stable/cli/pip_install/), using the _requirements.txt_ file.
-
-You should also consider using a [pipenv](https://github.com/pypa/pipenv) or [virtual environment](https://docs.python.org/3/library/venv.html) to isolate any Python dependencies from the rest of the system (although if you go this route, any cron job or similar automation should also run inside that env to have access to those deps).
+It is **highly recommended** to use the [latest release](https://github.com/CreamySoup/soup/releases/latest), and **install with [pipenv](https://github.com/pypa/pipenv)**, as described in the example below.
 
 Example:
 ```sh
 # Install/upgrade pipenv
 pip3 install --user --upgrade pipenv
 
-# Install soup.py requirements inside a Python 3 virtual environment
+# Install soup.py requirements inside a new Python 3 virtual environment
 pipenv install --three
 
 # Run soup.py inside the created virtual env, then exit the virtual env.
