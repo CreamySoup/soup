@@ -20,5 +20,5 @@ verbosity: 1
 # List of URLs to JSON files from which to query for updates.
 # Please see the relevant documentation for required JSON file syntax.
 recipes:
-    - https://cdn.jsdelivr.net/gh/CreamySoup/soup@self_update_deps/recipe_selfupdate.json
+    - https://cdn.jsdelivr.net/gh/CreamySoup/soup@main/recipe_selfupdate.json
     - https://cdn.jsdelivr.net/gh/CreamySoup/recipe-neotokyo@main/neotokyo_common.json
