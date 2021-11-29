@@ -83,7 +83,7 @@ GH_REPO_BASE = f"{GH_API_URL}/repos/{GH_REPO_OWNER}/{GH_REPO_NAME}"
 GH_RELEASES = f"{GH_REPO_BASE}/releases/latest"
 
 SCRIPT_NAME = "Creamy SourceMod Updater"
-SCRIPT_VERSION = semver.VersionInfo.parse("1.4.3")
+SCRIPT_VERSION = semver.VersionInfo.parse("1.4.4")
 
 
 def get_url_contents(url):
