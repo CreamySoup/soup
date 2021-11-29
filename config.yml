@@ -21,3 +21,10 @@ verbosity: 1
 # Please see the relevant documentation for required JSON file syntax.
 recipes:
     - https://cdn.jsdelivr.net/gh/CreamySoup/recipe-neotokyo@main/neotokyo_common.json
+
+# GitHub Personal Access Token. Fill one in if your IP address gets rate-limited;
+# if will bump your requests-per-hour limit from 60 to 5000, and is not IP address bound.
+# For security, this should always be a dummy token with zero GitHub access scopes/permissions.
+# https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
+gh_username: ""
+gh_personal_access_token: ""

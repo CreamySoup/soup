@@ -6,16 +6,19 @@ from datetime import datetime
 from io import BytesIO
 import hashlib
 import json
+import math
 import os
 import shutil
 import subprocess
 import sys
+import time
 import zipfile
 import urllib.request
 
 from appdirs import *
 from strictyaml import load, Map, Str, Int, Seq, YAMLError
 
+import requests
 import semver
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -51,7 +54,9 @@ with open(os.path.join(CFG_DIR, "config.yml"), "r") as f:
         "game_dir": Str(),
         "encoding": Str(),
         "verbosity": Int(),
-        "recipes": Seq(Str())
+        "recipes": Seq(Str()),
+        "gh_username": Str(),
+        "gh_personal_access_token": Str(),
     })
     CFG = load(f.read(), YAML_CFG_SCHEMA)
 assert CFG is not None
@@ -81,9 +86,10 @@ GH_REPO_OWNER = "CreamySoup"
 GH_REPO_NAME = "soup"
 GH_REPO_BASE = f"{GH_API_URL}/repos/{GH_REPO_OWNER}/{GH_REPO_NAME}"
 GH_RELEASES = f"{GH_REPO_BASE}/releases/latest"
+assert GH_API_URL.startswith("https://")  # require TLS
 
 SCRIPT_NAME = "Creamy SourceMod Updater"
-SCRIPT_VERSION = semver.VersionInfo.parse("1.4.6")
+SCRIPT_VERSION = semver.VersionInfo.parse("1.5.0")
 
 
 def get_url_contents(url):
@@ -122,12 +128,43 @@ def get_data_hash(data):
     return res
 
 
+def verify_gh_api_req(r):
+    try:
+        r.raise_for_status()
+    except requests.HTTPError as e:
+        http_code_first_digit = int(str(r.status_code)[:1])
+        # If it's a HTTP 5XX (server side error), don't error on our side.
+        if http_code_first_digit == 5:
+            print(f"Got HTTP response from remote: {r.status_code} {r.reason}")
+            return False
+        else:
+            raise
+    ratelimit = r.headers.get("X-RateLimit-Limit")
+    ratelimit_remaining = r.headers.get("X-RateLimit-Remaining")
+    ratelimit_used = r.headers.get("X-RateLimit-Used")
+    ratelimit_reset = r.headers.get("X-RateLimit-Reset")
+    if ratelimit is not None and ratelimit_remaining is not None and \
+            ratelimit_used is not None and ratelimit_reset is not None:
+        reset_mins = int(math.ceil((int(ratelimit_reset) - time.time()) / 60))
+        print_info("==> Using GitHub Releases API quota – "
+                   f"{ratelimit_remaining}/{ratelimit} requests remaining "
+                   f"(used {ratelimit_used} requests). This rate limit resets "
+                   f"in {reset_mins} minutes.")
+        if int(ratelimit_remaining) <= 0:
+            return False
+    return True
+
+
 # Check for updates of this script itself
 def self_update():
     print_info(f"=> Self-update check")
 
-    json_latest_release = json.loads(get_url_contents(GH_RELEASES))
-    latest_ver = semver.VersionInfo.parse(json_latest_release.get("tag_name"))
+    r = requests.get(GH_RELEASES, auth=(CFG["gh_username"].value,
+                                        CFG["gh_personal_access_token"].value))
+    if not verify_gh_api_req(r):
+        return
+    json_latest = r.json()
+    latest_ver = semver.VersionInfo.parse(json_latest.get("tag_name"))
 
     if SCRIPT_VERSION >= latest_ver:
         if SCRIPT_VERSION > latest_ver:
@@ -138,10 +175,16 @@ def self_update():
     print_info(f"!! Script self-update: version \"{SCRIPT_VERSION}\" --> "
                f"\"{latest_ver}\"...")
 
-    zip_url = json_latest_release.get("zipball_url")
+    zip_url = json_latest.get("zipball_url")
 
     release_commit_url = f"{GH_REPO_BASE}/git/ref/tags/{latest_ver}"
-    release_commit_json = json.loads(get_url_contents(release_commit_url))
+
+    r = requests.get(release_commit_url,
+                     auth=(CFG["gh_username"].value,
+                           CFG["gh_personal_access_token"].value))
+    if not verify_gh_api_req(r):
+        return
+    release_commit_json = r.json()
     hash_cutoff_point = 7
     sha = release_commit_json["object"]["sha"][:hash_cutoff_point]
 
