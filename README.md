@@ -33,6 +33,9 @@ It is **highly recommended** to use the [latest release](https://github.com/Crea
 
 Example:
 ```sh
+# Get the files
+git clone https://github.com/CreamySoup/soup && cd soup
+
 # Install/upgrade pipenv
 pip3 install --user --upgrade pipenv
 
@@ -43,6 +46,8 @@ pipenv install --three
 # This would be the cron-scheduled command.
 pipenv run python soup.py
 ```
+
+You'll also need to move the config.yml to its [expected config location, or set the config path environment variable](#config).
 
 ### Other requirements
 * Python 3
