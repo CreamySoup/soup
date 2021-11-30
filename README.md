@@ -94,6 +94,12 @@ Remove-Item $temp_dir.Path -Confirm:$confirm_delete
 Pop-Location # Pop the pwd
 ```
 
+### Troubleshooting
+
+> FileNotFoundError: \[Errno 2\] No such file or directory: \[...\]soup.py
+
+* Try moving the config.yml to the specified path, or override it with the `SOUP_CFG_DIR` environment variable. More information in the [Config section](#config).
+
 ## Config
 Configuration can be edited in the [_config.yml_](config.yml) file that exists in OS specific config file location, or as defined by the `SOUP_CFG_DIR` environment variable.
 
