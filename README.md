@@ -28,7 +28,7 @@ This warning applies not only to the _recipe_ files themselves, but also to any 
 
 It is **highly recommended** to use the [latest release](https://github.com/CreamySoup/soup/releases/latest), and **install with [pipenv](https://github.com/pypa/pipenv)**, as described in the example below.
 
-### Example
+### Examples
 ```sh
 # Get the files
 git clone https://github.com/CreamySoup/soup && cd soup
@@ -51,6 +51,38 @@ ln -s ./game_dir ~/path/to/srcds/game_dir
 # This would be the cron-scheduled command.
 pipenv run python soup.py
 ```
+
+#### PowerShell (Windows)
+```ps1
+# Push script location as pwd, because we do some relative paths
+Push-Location $PSScriptRoot
+
+$confirm_delete = $true # flip boolean if you like to live dangerously
+
+$release_info_url = 'https://api.github.com/repos/CreamySoup/soup/releases/latest'
+
+$response = Invoke-WebRequest $release_info_url |
+ConvertFrom-Json |
+Select zipball_url
+
+$zip_file = 'release.zip'
+$unzip_path = '.\soup'
+Remove-Item $zip_file -Confirm:$confirm_delete -ErrorAction Ignore
+Remove-Item $unzip_path -Confirm:$confirm_delete -Recurse -ErrorAction Ignore
+
+Invoke-WebRequest $response.zipball_url -OutFile $zip_file
+Expand-Archive -Path $zip_file -DestinationPath $unzip_path
+Remove-Item $zip_file -Confirm:$confirm_delete
+
+cd $unzip_path\*
+Move-Item -Path .\* -Destination ..\
+$temp_dir = Get-Location
+cd ..
+Remove-Item $temp_dir.Path -Confirm:$confirm_delete
+
+Pop-Location # Pop the pwd
+```
+
 
 You'll also need to move the config.yml to its [expected config location, or set the config path environment variable](#config).
 
