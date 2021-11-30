@@ -52,7 +52,7 @@ ln -s ./game_dir ~/path/to/srcds/game_dir
 pipenv run python soup.py
 ```
 
-#### PowerShell (Windows)
+#### PowerShell (Windows), fetch latest release
 ```ps1
 # Push script location as pwd, because we do some relative paths
 Push-Location $PSScriptRoot
