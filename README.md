@@ -98,7 +98,7 @@ Pop-Location # Pop the pwd
 
 > FileNotFoundError: \[Errno 2\] No such file or directory: \[...\]soup.py
 
-* Try moving the config.yml to the path specified in the error message, or alternatively override it with the `SOUP_CFG_DIR` environment variable. More information in the [Config section](#config).
+* Try moving the config.yml to the [path specified in the error message](#os-specific-config-file-locations), or alternatively override it with the `SOUP_CFG_DIR` environment variable. More information in the [Config section](#config).
 
 ## Config
 Configuration can be edited in the [_config.yml_](config.yml) file that exists in OS specific config file location, or as defined by the `SOUP_CFG_DIR` environment variable.
