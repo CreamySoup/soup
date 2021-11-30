@@ -22,9 +22,13 @@ While automation is nice, a malicious actor could use this updater to execute ar
 This warning applies not only to the _recipe_ files themselves, but also to any remote resources that those _recipes_ may point to.
 
 ## Installation
+
+### Requirements
+* Python 3
+
 It is **highly recommended** to use the [latest release](https://github.com/CreamySoup/soup/releases/latest), and **install with [pipenv](https://github.com/pypa/pipenv)**, as described in the example below.
 
-Example:
+### Example
 ```sh
 # Get the files
 git clone https://github.com/CreamySoup/soup && cd soup
@@ -49,9 +53,6 @@ pipenv run python soup.py
 ```
 
 You'll also need to move the config.yml to its [expected config location, or set the config path environment variable](#config).
-
-### Other requirements
-* Python 3
 
 ## Config
 Configuration can be edited in the [_config.yml_](config.yml) file that exists in OS specific config file location, or as defined by the `SOUP_CFG_DIR` environment variable.
