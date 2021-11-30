@@ -35,6 +35,15 @@ You'll also need to move the config.yml to its [expected config location, or set
 # Get the files
 git clone https://github.com/CreamySoup/soup && cd soup
 
+# Get name of latest release.
+git describe --tags --abbrev=0
+# By default, git will clone the most recent state of the repo,
+# but you can optionally pick this latest named release with:
+#     git checkout <tag>
+# where "<tag>" is replaced with the "git describe..." output.
+# To see what's changed since the last release:
+#     git log --graph --all --decorate --oneline --simplify-by-decoration
+
 # Install/upgrade pipenv
 pip3 install --user --upgrade pipenv
 
