@@ -175,7 +175,7 @@ For full examples of valid recipes, see the [Neotokyo recipe](https://github.com
 
 Recipe URLs are required to use the `https://` URI scheme, in other words plaintext HTTP connections are not allowed.
 
-If the recipe remote assets reside inside GitHub or similar repository host, it's recommended to use a CDN instead of hotlinking the repo directly for better uptime and performance. For example, using [jsDelivr](https://github.com/jsdelivr/jsdelivr), the raw GitHub URL `https://raw.githubusercontent.com/CreamySoup/soup/main/recipe_selfupdate.json` would turn into `https://cdn.jsdelivr.net/gh/CreamySoup/soup@main/recipe_selfupdate.json`.
+If the recipe remote assets reside inside GitHub or similar repository host, it's recommended to use a CDN instead of hotlinking the repo directly for better uptime and performance. For example, using [jsDelivr](https://github.com/jsdelivr/jsdelivr), the raw GitHub URL `https://raw.githubusercontent.com/CreamySoup/recipe-neotokyo/main/neotokyo_common.json` would turn into `https://cdn.jsdelivr.net/gh/CreamySoup/recipe-neotokyo@main/neotokyo_common.json`.
 
 ## Usage
 The script can be run manually with `python soup.py`, but is recommended to be automated as a [cron job](https://en.wikipedia.org/wiki/Cron) or similar.
