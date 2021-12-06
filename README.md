@@ -57,12 +57,17 @@ rm -i Pipfile*
 pipenv install
 
 # If you want to symbolic link to your SRCDS from the git repo dir:
-# Replace "game_dir", as defined in config.yml.
-ln -s ./game_dir ~/path/to/srcds/game_dir
-#     Windows alternative: mklink /j .\game_dir C:\path\to\srcds\game_dir
-
-# For example of the above, for "game_dir" equals "NeotokyoSource":
-#     ln -s ./NeotokyoSource ~/path/to/srcds/NeotokyoSource
+# Replace the instances of "game_dir", as defined in config.yml.
+#
+#   Linux symlink:
+#     ln -s ./game_dir ~/path/to/srcds/game_dir
+#       For example of the above, for "game_dir" equals "NeotokyoSource":
+#       ln -s ./NeotokyoSource ~/path/to/srcds/NeotokyoSource
+#
+#   Windows junction:
+#     mklink /j .\game_dir C:\path\to\srcds\game_dir
+#       For example of the above, for "game_dir" equals "NeotokyoSource":
+#       mklink /j .\NeotokyoSource C:\path\to\srcds\NeotokyoSource
 
 # Run soup.py inside the created virtual env, then exit the virtual env.
 # This would be the cron-scheduled command.
