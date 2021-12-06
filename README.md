@@ -47,8 +47,11 @@ git describe --tags --abbrev=0
 # Install/upgrade pipenv
 pip3 install --user --upgrade pipenv
 
-# Install soup.py requirements inside a new Python 3 virtual environment
-pipenv install --three
+# Remove any previously generated Pipfiles (we generate it from requirements.txt)
+rm -i Pipfile*
+
+# Install the requirements inside a new Python (3) virtual environment
+pipenv install
 
 # If you want to symbolic link to your SRCDS from the git repo dir:
 # Replace "game_dir", as defined in config.yml.
