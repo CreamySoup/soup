@@ -32,6 +32,8 @@ It is **highly recommended** to use the [latest release](https://github.com/Crea
 You'll also need to move the config.yml to its [expected config location, or set the config path environment variable](#config).
 
 ### Example scripts
+
+#### Linux shell or Windows command prompt
 ```sh
 # Get the files
 git clone https://github.com/CreamySoup/soup && cd soup
