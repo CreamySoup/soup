@@ -53,7 +53,7 @@ pip3 install --user --upgrade pipenv
 # Remove any previously generated Pipfiles (we generate it from requirements.txt)
 rm -i Pipfile*
 
-# Install the requirements inside a new Python (3) virtual environment
+# Install the requirements inside a Python (3) virtual environment
 pipenv install
 
 # If you want to symbolic link to your SRCDS from the git repo dir:
