@@ -75,6 +75,8 @@ pipenv run python soup.py
 ```
 
 #### PowerShell (Windows), fetch latest release
+This is not required if you follow the [instructions above](#linux-shell-or-windows-command-prompt), and is here just for convenience.
+
 ```ps1
 # Push script location as pwd, because we do some relative paths
 Push-Location $PSScriptRoot
