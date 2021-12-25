@@ -52,7 +52,7 @@ SCRIPT_NAME = "Creamy SourceMod Updater"
 # Note: This plugin uses an auto-updater function reliant on version number,
 # please don't manually modify this version number unless you know
 # that's what you want.
-SCRIPT_VERSION = semver.VersionInfo.parse("1.6.1")
+SCRIPT_VERSION = semver.VersionInfo.parse("1.6.2")
 
 CFG_DIR = os.environ.get("SOUP_CFG_DIR") or user_config_dir("soup")
 with open(os.path.join(CFG_DIR, "config.yml"), "r") as f:
@@ -208,7 +208,7 @@ def self_update():
             f.flush()
             os.fsync(f.fileno())
 
-        subprocess.run("python3 -m pipenv install -r requirements.txt").check_returncode()
+        subprocess.run(["pipenv", "install", "-r", "requirements.txt"]).check_returncode()
 
         with open(realpath, "wb+") as f:
             f.seek(0)
