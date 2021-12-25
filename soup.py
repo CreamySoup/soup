@@ -52,7 +52,7 @@ SCRIPT_NAME = "Creamy SourceMod Updater"
 # Note: This plugin uses an auto-updater function reliant on version number,
 # please don't manually modify this version number unless you know
 # that's what you want.
-SCRIPT_VERSION = semver.VersionInfo.parse("1.5.1")
+SCRIPT_VERSION = semver.VersionInfo.parse("1.6.0")
 
 CFG_DIR = os.environ.get("SOUP_CFG_DIR") or user_config_dir("soup")
 with open(os.path.join(CFG_DIR, "config.yml"), "r") as f:
@@ -122,7 +122,10 @@ def print_debug(msg):
 
 
 def get_file_hash(file):
-    return get_data_hash(file.read().encode(CFG["encoding"].value))
+    try:
+        return get_data_hash(file.read().encode(CFG["encoding"].value))
+    except UnicodeDecodeError as e:
+        return ""
 
 
 def get_data_hash(data):
