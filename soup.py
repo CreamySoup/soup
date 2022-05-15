@@ -1,5 +1,25 @@
 #!/usr/bin/env python3
 
+"""Helper script for automatic SourceMod/SRCDS updates.
+
+   This Python 3 script queries online JSON lists ("RECIPES")
+   of in-development SourceMod plugins, and compares their source code
+   to the local gameserver's files, and automatically recompiles
+   plugins where the source code has seen changes since the last run.
+   It also automatically updates itself on each script run.
+
+   This file should go to the directory path below the game root dir
+   such that the relative paths below this comment make sense:
+   "./<game_dir>/...", or so on.
+
+   To fully automate the update process, this script could be
+   scheduled to run for example once a day, for example with
+   the command: python ./soup.py
+
+   For more details, please refer to the documentation
+   available in this project's repositories.
+"""
+
 from __future__ import print_function
 
 from datetime import datetime
@@ -15,38 +35,12 @@ import time
 import zipfile
 import urllib.request
 
-from appdirs import *
-from strictyaml import load, Map, Str, Int, Seq, YAMLError
+from appdirs import user_config_dir
+from strictyaml import load, Map, Str, Int, Seq
 
 import requests
 import semver
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-#                                                                             #
-# soup                                                                        #
-#                                                                             #
-# CreamySoup/"Creamy SourceMod Updater", a helper script for automatic       #
-# SourceMod plugin updates for in-active-development plugins.               #
-#                                                                          #
-# This Python 3 script queries online JSON lists ("RECIPES")              #
-# of in-development SourceMod plugins, and compares their source code    #
-# to the local gameserver's files, and automatically recompiles         #
-# plugins where the source code has seen changes since the last run.   #
-# It also automatically updates itself on each script run.            #
-#                                                                    #
-# This file should go to the directory path below the game root dir #
-# such that the relative paths below this comment make sense:      #
-#  "./<game_dir>/...", or so on.                                  #
-#                                                                #
-# To fully automate the update process, this script could be    #
-# scheduled to run for example once a day, for example with    #
-# the command:                                                #
-#  "python ./soup.py"                                        #
-#                                                           #
-# For more details, please refer to the documentation      #
-# available in this project's repositories.               #
-#                                                        #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 SCRIPT_NAME = "Creamy SourceMod Updater"
 # Note: This plugin uses an auto-updater function reliant on version number,
@@ -55,7 +49,8 @@ SCRIPT_NAME = "Creamy SourceMod Updater"
 SCRIPT_VERSION = semver.VersionInfo.parse("1.6.2")
 
 CFG_DIR = os.environ.get("SOUP_CFG_DIR") or user_config_dir("soup")
-with open(os.path.join(CFG_DIR, "config.yml"), "r") as f:
+with open(os.path.join(CFG_DIR, "config.yml"),
+          mode="r", encoding="utf-8") as F:
     YAML_CFG_SCHEMA = Map({
         "game_dir": Str(),
         "encoding": Str(),
@@ -64,7 +59,7 @@ with open(os.path.join(CFG_DIR, "config.yml"), "r") as f:
         "gh_username": Str(),
         "gh_personal_access_token": Str(),
     })
-    CFG = load(f.read(), YAML_CFG_SCHEMA)
+    CFG = load(F.read(), YAML_CFG_SCHEMA)
 assert CFG is not None
 
 # Relative path to the server's "addons/sourcemod/plugins" directory.
@@ -96,59 +91,64 @@ assert GH_API_URL.startswith("https://")  # require TLS
 
 
 def get_url_contents(url):
+    """Return contents of a HTTPS URI."""
     # Require TLS for anti-tamper.
     # Only checking URI scheme and trusting the request lib to handle the rest.
     assert url.startswith("https://")
     try:
         return urllib.request.urlopen(url).read()
-    except urllib.error.HTTPError as e:
-        http_code_first_digit = int(str(e.code)[:1])
+    except urllib.error.HTTPError as err:
+        http_code_first_digit = int(str(err.code)[:1])
         # If it's a HTTP 5XX (server side error), don't error on our side.
         if http_code_first_digit == 5:
-            print(f"Got HTTP response from remote: {e.code} {e.reason}")
+            print(f"Got HTTP response from remote: {err.code} {err.reason}")
         else:
             raise
     return None
 
 
 def print_info(msg):
+    """Print info message (according to verbosity config)."""
     if CFG["verbosity"].value > 0:
         print(msg)
 
 
 def print_debug(msg):
+    """Print debug message (according to verbosity config)."""
     if CFG["verbosity"].value > 1:
         print(msg)
 
 
 def get_file_hash(file):
+    """Get a hash value for file input."""
     try:
         return get_data_hash(file.read().encode(CFG["encoding"].value))
-    except UnicodeDecodeError as e:
+    except UnicodeDecodeError:
         return ""
 
 
 def get_data_hash(data):
+    """Get a hash value for data input."""
     res = hashlib.sha256(data).hexdigest()
     assert len(res) > 0
     return res
 
 
-def verify_gh_api_req(r):
+def verify_gh_api_req(req):
+    """Verify GitHub request validity."""
     try:
-        r.raise_for_status()
-    except requests.HTTPError as e:
-        http_code_first_digit = int(str(r.status_code)[:1])
+        req.raise_for_status()
+    except requests.HTTPError:
+        http_code_first_digit = int(str(req.status_code)[:1])
         # If it's a HTTP 5XX (server side error), don't error on our side.
         if http_code_first_digit == 5:
-            print(f"Got HTTP response from remote: {r.status_code} {r.reason}")
+            print(f"Got HTTP response from remote: {req.status_code} {req.reason}")
             return False
-        else:
-            raise
-    ratelimit = r.headers.get("X-RateLimit-Limit")
-    ratelimit_remaining = r.headers.get("X-RateLimit-Remaining")
-    ratelimit_used = r.headers.get("X-RateLimit-Used")
-    ratelimit_reset = r.headers.get("X-RateLimit-Reset")
+        raise
+    ratelimit = req.headers.get("X-RateLimit-Limit")
+    ratelimit_remaining = req.headers.get("X-RateLimit-Remaining")
+    ratelimit_used = req.headers.get("X-RateLimit-Used")
+    ratelimit_reset = req.headers.get("X-RateLimit-Reset")
     if ratelimit is not None and ratelimit_remaining is not None and \
             ratelimit_used is not None and ratelimit_reset is not None:
         reset_mins = int(math.ceil((int(ratelimit_reset) - time.time()) / 60))
@@ -161,15 +161,15 @@ def verify_gh_api_req(r):
     return True
 
 
-# Check for updates of this script itself
 def self_update():
-    print_info(f"=> Self-update check")
+    """Check for updates of this script itself."""
+    print_info("=> Self-update check")
 
-    r = requests.get(GH_RELEASES, auth=(CFG["gh_username"].value,
-                                        CFG["gh_personal_access_token"].value))
-    if not verify_gh_api_req(r):
+    req = requests.get(GH_RELEASES, auth=(CFG["gh_username"].value,
+                                          CFG["gh_personal_access_token"].value))
+    if not verify_gh_api_req(req):
         return
-    json_latest = r.json()
+    json_latest = req.json()
     latest_ver = semver.VersionInfo.parse(json_latest.get("tag_name"))
 
     if SCRIPT_VERSION >= latest_ver:
@@ -185,37 +185,39 @@ def self_update():
 
     release_commit_url = f"{GH_REPO_BASE}/git/ref/tags/{latest_ver}"
 
-    r = requests.get(release_commit_url,
+    req = requests.get(release_commit_url,
                      auth=(CFG["gh_username"].value,
                            CFG["gh_personal_access_token"].value))
-    if not verify_gh_api_req(r):
+    if not verify_gh_api_req(req):
         return
-    release_commit_json = r.json()
+    release_commit_json = req.json()
     hash_cutoff_point = 7
     sha = release_commit_json["object"]["sha"][:hash_cutoff_point]
 
     ballname_soup = f"{GH_REPO_OWNER}-{GH_REPO_NAME}-{sha}/soup.py"
     ballname_reqs = f"{GH_REPO_OWNER}-{GH_REPO_NAME}-{sha}/requirements.txt"
 
-    with zipfile.ZipFile(BytesIO(urllib.request.urlopen(zip_url).read())) as z:
-        realpath = os.path.realpath(__file__)
+    with zipfile.ZipFile(BytesIO(
+            urllib.request.urlopen(zip_url).read())) as file_zip:
+        realpath_self = os.path.realpath(__file__)
 
-        with open(os.path.join(os.path.dirname(realpath), "requirements.txt"),
-                  "wb+") as f:
-            f.seek(0)
-            f.write(z.open(ballname_reqs).read())
-            f.truncate()
-            f.flush()
-            os.fsync(f.fileno())
+        with open(os.path.join(os.path.dirname(realpath_self),
+                               "requirements.txt"),
+                  mode="wb+") as file_reqs:
+            file_reqs.seek(0)
+            file_reqs.write(file_zip.open(ballname_reqs).read())
+            file_reqs.truncate()
+            file_reqs.flush()
+            os.fsync(file_reqs.fileno())
 
-        subprocess.run(["pipenv", "install", "-r", "requirements.txt"]).check_returncode()
+        subprocess.run(["pipenv", "install", "-r", "requirements.txt"], check=True)
 
-        with open(realpath, "wb+") as f:
-            f.seek(0)
-            f.write(z.open(ballname_soup).read())
-            f.truncate()
-            f.flush()
-            os.fsync(f.fileno())
+        with open(realpath_self, "wb+") as file_self:
+            file_self.seek(0)
+            file_self.write(file_zip.open(ballname_soup).read())
+            file_self.truncate()
+            file_self.flush()
+            os.fsync(file_self.fileno())
 
     print_info("!! Self-update successful.")
 
@@ -226,6 +228,7 @@ def self_update():
 
 
 def check_for_updates(recipe):
+    """Check for updates of a recipe."""
     print_info(f"=> Checking for recipe updates: {recipe}")
 
     update_file_contents = get_url_contents(recipe)
@@ -242,17 +245,17 @@ def check_for_updates(recipe):
 
     root_sections = ["includes", "plugins", "updater"]
     for root_section in root_sections:
-        kvs = json_data.get(root_section)
-        if kvs is None:
+        kv_pairs = json_data.get(root_section)
+        if kv_pairs is None:
             continue
         if root_section == "updater":
             print(f"==> ! Warning: config key '{root_section}' has been "
                   "deprecated! Please update your config file.")
             continue
-        for kv in kvs:
-            if kv is None:
+        for kv_pair in kv_pairs:
+            if kv_pair is None:
                 continue
-            for index, (key, value) in enumerate(kv.items(), start=1):
+            for _, (key, value) in enumerate(kv_pair.items(), start=1):
                 if root_section == "includes":
                     if key == "name":
                         include_name = value
@@ -275,10 +278,11 @@ def check_for_updates(recipe):
                                     f"{remote_inc_hash}")
 
                         open_mode = "r+" if inc_exists_locally else "w"
-                        f = open(local_inc_path, open_mode, newline="\n")
+                        f_local_inc = open(local_inc_path, mode=open_mode,
+                                           newline="\n", encoding="utf-8")
 
                         if inc_exists_locally:
-                            local_inc_hash = get_file_hash(f)
+                            local_inc_hash = get_file_hash(f_local_inc)
                             print_debug("==> Include code local hash: "
                                         f"{local_inc_hash}")
 
@@ -294,19 +298,20 @@ def check_for_updates(recipe):
                                         f"updating include \"{include_name}"
                                         "\"!\n"
                                         "====> Writing source code to disk...")
-                            f.seek(0)
-                            f.write(remote_inc.decode(CFG["encoding"].value))
-                            f.truncate()
-                            f.flush()
-                            os.fsync(f)
-                        f.close()
+                            f_local_inc.seek(0)
+                            f_local_inc.write(remote_inc.decode(CFG["encoding"].value))
+                            f_local_inc.truncate()
+                            f_local_inc.flush()
+                            os.fsync(f_local_inc)
+                        f_local_inc.close()
 
                         if not hashes_match:
                             print_debug("====> Verifying include code "
                                         "integrity...")
                             assert os.path.isfile(local_inc_path)
-                            with open(local_inc_path, "r", newline="\n") as f:
-                                new_local_inc_hash = get_file_hash(f)
+                            with open(local_inc_path, mode="r",
+                                      newline="\n", encoding="utf-8") as f_local_inc:
+                                new_local_inc_hash = get_file_hash(f_local_inc)
 
                             hashes_match = \
                                 (new_local_inc_hash == remote_inc_hash)
@@ -344,10 +349,11 @@ def check_for_updates(recipe):
                                     f"{remote_code_hash}")
 
                         open_mode = "r+" if code_exists_locally else "w"
-                        f = open(local_source_path, open_mode, newline="\n")
+                        f_local_src = open(local_source_path, mode=open_mode,
+                                           newline="\n", encoding="utf-8")
 
                         if code_exists_locally:
-                            local_code_hash = get_file_hash(f)
+                            local_code_hash = get_file_hash(f_local_src)
                             print_debug("==> Plugin code local hash: "
                                         f"{local_code_hash}")
 
@@ -362,21 +368,21 @@ def check_for_updates(recipe):
                             print_debug("===> Source code hashes differ; "
                                         f"updating plugin \"{plugin_name}\"!\n"
                                         "====> Writing source code to disk...")
-                            f.seek(0)
-                            f.write(remote_code.decode(CFG["encoding"].value))
-                            f.truncate()
-                            f.flush()
-                            os.fsync(f)
-                        f.close()
+                            f_local_src.seek(0)
+                            f_local_src.write(remote_code.decode(CFG["encoding"].value))
+                            f_local_src.truncate()
+                            f_local_src.flush()
+                            os.fsync(f_local_src)
+                        f_local_src.close()
 
                         if not hashes_match:
                             print_debug("====> Verifying plugin code "
                                         "integrity...")
                             assert os.path.isfile(local_source_path)
 
-                            with open(local_source_path, "r",
-                                      newline="\n") as f:
-                                new_local_code_hash = get_file_hash(f)
+                            with open(local_source_path, mode="r",
+                                      newline="\n", encoding="utf-8") as f_local_src:
+                                new_local_code_hash = get_file_hash(f_local_src)
 
                             hashes_match = \
                                 (new_local_code_hash == remote_code_hash)
@@ -399,9 +405,8 @@ def check_for_updates(recipe):
                                                          compiler_binary)
                             assert os.path.isfile(compiler_path)
 
-                            subprocess.run(
-                                [compiler_path,
-                                 local_source_path]).check_returncode()
+                            subprocess.run([compiler_path, local_source_path],
+                                           check=True)
 
                             print_debug("\n====> Installing plugin "
                                         f"\"{plugin_name}\"...")
@@ -435,6 +440,7 @@ to {os.path.join(PLUGINS_LOCAL_PATH, (plugin_name + ".smx"))}""")
 
 
 def main():
+    """Entry point."""
     print_info(f"=== Running {SCRIPT_NAME}, v.{SCRIPT_VERSION} ===\n"
                f"Current time: {datetime.now()}")
     self_update()
